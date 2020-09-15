@@ -38,10 +38,10 @@ GET /pairs/{base_asset_id}/{quote_asset_id}
   "data": {
     "base_asset_id": "66152c0b-3355-38ef-9ec5-cae97e29472a",
     "quote_asset_id": "965e5c6e-434c-3fa9-b780-c50f43cd955c",
-    "base_amount": "1714432671.4860945",
-    "quote_amount": "1428792957.89508717",
-    "fee_percent": "0.003",
-    "liquidity": "1441664019.41091031"
+    "base_amount": "1714432671.4860945", // 流动池里面 base asset 的数量
+    "quote_amount": "1428792957.89508717", // 流动池里面 quote asset 的数量
+    "fee_percent": "0.003", // 手续费比例
+    "liquidity": "1441664019.41091031" // 总的流动性份额
   }
 }
 ```
@@ -100,8 +100,8 @@ POST /pairs/{base_asset_id}/{quote_asset_id}/deposit
 
 ```json5
 {
-    "base_amount":"1",
-    "quote_amount":"1.00185986"
+    "base_amount":"1", // 注入 base asset 的数量
+    "quote_amount":"1.00185986" // 注入 quote asset 的数量
 }
 ```
 
@@ -161,7 +161,7 @@ POST /orders/pre
     "pay_asset_id": "f5ef6b5d-cc5a-3d90-b2c0-a2fd386e7a3c",
     "fill_asset_id": "4d8c508b-91c5-375b-92b0-ee702ed2dac5",
     "funds": "990",
-    "amount": "0.02442823",
+    "amount": "0.02442823", // 预估能买到的币的数量
     "min_amount": "0",
     "routes": "d6TR", // route id，代表 route 路径
     "route_assets": [
@@ -224,8 +224,8 @@ GET /orders/{order_id}
     "state": "Done", // 订单状态 Trading Rejected Done
     "pay_asset_id": "6cfe566e-4aad-470b-8c9a-2fd35b49c68d",
     "fill_asset_id": "c6d0c728-2624-429b-8e0d-d9d19b6592fa",
-    "funds": "1",
-    "amount": "0.00025725",
+    "funds": "1", // 付款的币的数量
+    "amount": "0.00025725", // 买到的币的数量
     "min_amount": "0.0002521",
     "routes": "1bv",
     "route_assets": [
