@@ -87,6 +87,87 @@ GET /pairs
 }
 ```
 
+### 读取全部 assets
+
+```http request
+GET /assets
+```
+
+**Response:**
+
+```json5
+{
+  "data": {
+    "assets": [
+      {
+        "id": "c6d0c728-2624-429b-8e0d-d9d19b6592fa",
+        "name": "Bitcoin",
+        "symbol": "BTC",
+        "logo": "https://mixin-images.zeromesh.net/HvYGJsV5TGeZ-X9Ek3FEQohQZ3fE9LBEBGcOcn4c4BNHovP4fW4YB97Dg5LcXoQ1hUjMEgjbl1DPlKg1TW7kK6XP=s128",
+        "chain_id": "c6d0c728-2624-429b-8e0d-d9d19b6592fa",
+        "chain": {
+          "id": "c6d0c728-2624-429b-8e0d-d9d19b6592fa",
+          "name": "Bitcoin",
+          "symbol": "BTC",
+          "logo": "https://mixin-images.zeromesh.net/HvYGJsV5TGeZ-X9Ek3FEQohQZ3fE9LBEBGcOcn4c4BNHovP4fW4YB97Dg5LcXoQ1hUjMEgjbl1DPlKg1TW7kK6XP=s128",
+          "chain_id": "c6d0c728-2624-429b-8e0d-d9d19b6592fa",
+          "price": "10741.16"
+        },
+        "price": "10741.16"
+      },
+      {
+        "id": "43d61dcd-e413-450d-80b8-101d5e903357",
+        "name": "Ether",
+        "symbol": "ETH",
+        "logo": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128",
+        "chain_id": "43d61dcd-e413-450d-80b8-101d5e903357",
+        "chain": {
+          "id": "43d61dcd-e413-450d-80b8-101d5e903357",
+          "name": "Ether",
+          "symbol": "ETH",
+          "logo": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128",
+          "chain_id": "43d61dcd-e413-450d-80b8-101d5e903357",
+          "price": "375.23"
+        },
+        "price": "375.23"
+      },
+      {
+        "id": "fd11b6e3-0b87-41f1-a41f-f0e9b49e5bf0",
+        "name": "Bitcoin Cash",
+        "symbol": "BCH",
+        "logo": "https://mixin-images.zeromesh.net/tqt14x8iwkiCR_vIKIw6gAAVO8XpZH7ku7ZJYB5ArMRA6grN9M1oCI7kKt2QqBODJwr17sZxDCDTjXHOgIixzv6X=s128",
+        "chain_id": "fd11b6e3-0b87-41f1-a41f-f0e9b49e5bf0",
+        "chain": {
+          "id": "fd11b6e3-0b87-41f1-a41f-f0e9b49e5bf0",
+          "name": "Bitcoin Cash",
+          "symbol": "BCH",
+          "logo": "https://mixin-images.zeromesh.net/tqt14x8iwkiCR_vIKIw6gAAVO8XpZH7ku7ZJYB5ArMRA6grN9M1oCI7kKt2QqBODJwr17sZxDCDTjXHOgIixzv6X=s128",
+          "chain_id": "fd11b6e3-0b87-41f1-a41f-f0e9b49e5bf0",
+          "price": "238.83"
+        },
+        "price": "238.83"
+      },
+      {
+        "id": "574388fd-b93f-4034-a682-01c2bc095d17",
+        "name": "Bitcoin SV",
+        "symbol": "BSV",
+        "logo": "https://mixin-images.zeromesh.net/1iUl5doLjMSv-ElcVCI4YgD1uIayDbZcQP0WjFEajoY1-qQZmVEl5GgUCtsp8CP0aj96a5Rwi-weQ5YA64lyQzU=s128",
+        "chain_id": "574388fd-b93f-4034-a682-01c2bc095d17",
+        "chain": {
+          "id": "574388fd-b93f-4034-a682-01c2bc095d17",
+          "name": "Bitcoin SV",
+          "symbol": "BSV",
+          "logo": "https://mixin-images.zeromesh.net/1iUl5doLjMSv-ElcVCI4YgD1uIayDbZcQP0WjFEajoY1-qQZmVEl5GgUCtsp8CP0aj96a5Rwi-weQ5YA64lyQzU=s128",
+          "chain_id": "574388fd-b93f-4034-a682-01c2bc095d17",
+          "price": "167.78"
+        },
+        "price": "167.78"
+      }
+    ]
+  }
+}
+```
+
 ### 注入流动性 (Authorization Token Required)
 
 ```http request
