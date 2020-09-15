@@ -11,8 +11,6 @@
 
 ### Example
 
-**Quick Start**
-
 ```golang
 func example() {
 	const (
