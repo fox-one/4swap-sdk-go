@@ -19,7 +19,7 @@
 }
 ```
 
-将上述 payload 先 json encode 或者 msgpack encode 然后再 base64 encode 则得到转账 memo
+将上述 payload 先 json encode 或者 msgpack encode 然后再 base64 encode 得到转账 memo
 
 ## API
 
