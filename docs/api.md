@@ -10,7 +10,7 @@
 
 转账 memo 需要带上要买的币，以及路径和最小买入数量
 
-```json
+```json5
 {
     "t": "Add", // action type
     "a": "66152c0b-3355-38ef-9ec5-cae97e29472a", // fill asset id,
