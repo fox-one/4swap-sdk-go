@@ -1,20 +1,14 @@
-## 4swap
+package fswap_test
 
-4swap (Mixin ID: 7000103537) 是 Fox.ONE 团队基于 Mixin Network 开发的 Swap 协议交易所，支持 Mixin 钱包里面任意币之间的兑换。
+import (
+	"context"
+	"log"
 
-### Authorization
+	fswap "github.com/fox-one/4swap-sdk-go"
+	"github.com/shopspring/decimal"
+)
 
-支持两种 Token
-
-1. 4swap 机器人 Oauth 授权得到的 token
-2. 机器人自己签出来的 **/me** 的 [Authentication Token](https://developers.mixin.one/api/a-beginning/authentication-token)，scp 必须是 **FULL**。
-
-### Example
-
-**Quick Start**
-
-```golang
-func example() {
+func SimpleExample() {
 	const (
 		btc   = "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
 		xin   = "c94ac88f-4671-3976-b60a-09064f1811e8"
@@ -86,4 +80,3 @@ func example() {
 
 	log.Println("handle swap transfer", transfer.TraceID)
 }
-```
