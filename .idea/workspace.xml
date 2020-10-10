@@ -2,18 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="18d99b8a-593c-4428-816f-af00663ffff8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/4swap_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/context.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/deposit.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/deposit_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/error.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/order.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pair.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pair_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/transaction.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/transfer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +19,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/Cellar/go/1.15/libexec" />
+  <component name="GOROOT" path="/usr/local/opt/go/libexec" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -136,6 +128,10 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state x="1186" y="575" key="#GOROOT" timestamp="1602302166391">
+      <screen x="0" y="23" width="2560" height="1377" />
+    </state>
+    <state x="1186" y="575" key="#GOROOT/0.23.2560.1377@0.23.2560.1377" timestamp="1602302166391" />
     <state x="721" y="552" key="#Go_Modules" timestamp="1600057754907">
       <screen x="0" y="23" width="2560" height="1377" />
     </state>
