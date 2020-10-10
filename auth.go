@@ -9,8 +9,14 @@ import (
 
 // GenerateToken create a new mixin authorization token
 // store.Scope must be 'FULL'
-func GenerateToken(store mixin.Keystore, exp time.Duration) (string, error) {
-	auth, err := mixin.AuthFromKeystore(&store)
+func GenerateToken(clientID, sessionID, sessionKey string, exp time.Duration) (string, error) {
+	auth, err := mixin.AuthFromKeystore(&mixin.Keystore{
+		ClientID:   clientID,
+		SessionID:  sessionID,
+		PrivateKey: sessionKey,
+		Scope:      "FULL",
+	})
+
 	if err != nil {
 		return "", err
 	}
