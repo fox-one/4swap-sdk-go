@@ -2,7 +2,6 @@ package fswap
 
 import (
 	"container/list"
-	"fmt"
 	"sort"
 
 	"github.com/shopspring/decimal"
@@ -218,8 +217,6 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		last, ok := p.Last()
 		return ok && last.PayAssetID == payAssetID
 	})
-
-	fmt.Println(len(paths), "paths")
 
 	if len(paths) == 0 {
 		return nil, ErrInsufficientLiquiditySwapped
