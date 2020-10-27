@@ -12,6 +12,7 @@ var (
 	ErrInsufficientLiquiditySwapped = errors.New("insufficient liquidity swapped")
 )
 
+// Result represent Swap Result
 type Result struct {
 	PayAssetID  string
 	PayAmount   decimal.Decimal
@@ -22,6 +23,7 @@ type Result struct {
 	RouteID     int64
 }
 
+// Swap trade in a pair
 func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, error) {
 	K := pair.BaseAmount.Mul(pair.QuoteAmount)
 	if !K.IsPositive() {
@@ -61,6 +63,7 @@ func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, er
 	return r, nil
 }
 
+// ReverseSwap is a Reverse version of Swap
 func ReverseSwap(pair *Pair, fillAssetID string, fillAmount decimal.Decimal) (*Result, error) {
 	K := pair.BaseAmount.Mul(pair.QuoteAmount)
 	if !K.IsPositive() {
