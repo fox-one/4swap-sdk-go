@@ -35,25 +35,25 @@ type PreOrderReq struct {
 	PayAssetID  string `json:"pay_asset_id,omitempty"`
 	FillAssetID string `json:"fill_asset_id,omitempty"`
 	// funds 和 amount 二选一
-	Funds     decimal.Decimal `json:"funds,omitempty"`
-	Amount    decimal.Decimal `json:"amount,omitempty"`
+	Funds  decimal.Decimal `json:"funds,omitempty"`
+	Amount decimal.Decimal `json:"amount,omitempty"`
+
+	// deprecated
 	MinAmount decimal.Decimal `json:"min_amount,omitempty"`
 }
 
 // PreOrder 预下单
 func PreOrder(ctx context.Context, req *PreOrderReq) (*Order, error) {
-	const uri = "/api/orders/pre"
-	resp, err := Request(ctx).SetBody(req).Post(uri)
+	pairs, err := ListPairs(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var order Order
-	if err := UnmarshalResponse(resp, &order); err != nil {
-		return nil, err
+	if req.Funds.IsPositive() {
+		return Route(pairs, req.PayAssetID, req.FillAssetID, req.Funds)
 	}
 
-	return &order, nil
+	return ReverseRoute(pairs, req.PayAssetID, req.FillAssetID, req.Amount)
 }
 
 // ReadOrder return order detail by id
