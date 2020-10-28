@@ -1,8 +1,7 @@
 package fswap
 
 import (
-	"container/list"
-	"sort"
+	"math"
 
 	"github.com/shopspring/decimal"
 	"github.com/speps/go-hashids"
@@ -37,46 +36,32 @@ func (g Graph) AddPair(pair *Pair) {
 	g.Add(pair.QuoteAssetID, pair.BaseAssetID, pair)
 }
 
-type Path struct {
-	list.List
+type node struct {
+	*Result
 
-	subPaths []*Path
+	p *node
+	d int
 }
 
-func (path *Path) Depth() int {
-	return path.Len()
-}
-
-func (path *Path) Add(result *Result) {
-	path.PushBack(result)
-}
-
-func (path *Path) Last() (*Result, bool) {
-	if last := path.Back(); last != nil {
-		return last.Value.(*Result), true
+func (n *node) Cmp(a *node) int {
+	if c := n.FillAmount.Cmp(a.FillAmount); c != 0 {
+		return c
 	}
 
-	return nil, false
+	return cmpDepth(n.d, a.d)
 }
 
-func (path *Path) Results(reverse bool) []*Result {
-	results := make([]*Result, 0, path.Len())
-	for e := path.Front(); e != nil; e = e.Next() {
-		results = append(results, e.Value.(*Result))
+func (n *node) ReverseCmp(a *node) int {
+	if c := a.PayAmount.Cmp(n.PayAmount); c != 0 {
+		return c
 	}
 
-	if reverse {
-		for i, j := 0, len(results)-1; i < j; i, j = i+1, j-1 {
-			results[i], results[j] = results[j], results[i]
-		}
-	}
-
-	return results
+	return cmpDepth(n.d, a.d)
 }
 
-func (path *Path) ContainPair(pair *Pair) bool {
-	for _, r := range path.Results(false) {
-		if r.RouteID == pair.RouteID {
+func (n *node) Contain(id int64) bool {
+	for iter := n; iter != nil && iter.d > 0; iter = iter.p {
+		if iter.RouteID == id {
 			return true
 		}
 	}
@@ -84,78 +69,92 @@ func (path *Path) ContainPair(pair *Pair) bool {
 	return false
 }
 
-func (path *Path) Sub() *Path {
-	sub := &Path{}
-	for _, r := range path.Results(false) {
-		sub.Add(r)
+func (n *node) Results(reverse bool) []*Result {
+	results := make([]*Result, n.d)
+	for iter := n; iter != nil && iter.d > 0; iter = iter.p {
+		idx := iter.d - 1
+		if reverse {
+			idx = len(results) - iter.d
+		}
+
+		results[idx] = iter.Result
 	}
 
-	path.subPaths = append(path.subPaths, sub)
-	return sub
+	return results
 }
 
-func (path *Path) ListAllPaths(filter func(p *Path) bool) []*Path {
-	if filter(path) {
-		return []*Path{path}
-	}
-
-	var paths []*Path
-	for _, sub := range path.subPaths {
-		paths = append(paths, sub.ListAllPaths(filter)...)
-	}
-
-	return paths
-}
-
-func (g Graph) Route(p *Path, payAsset, fillAsset string, payAmount decimal.Decimal) {
-	if payAsset == fillAsset {
+func (n *node) route(g Graph, fillAsset string, best *node) {
+	if n.d >= MaxRouteDepth {
 		return
 	}
 
-	if p.Depth() >= MaxRouteDepth {
-		return
-	}
-
-	for _, pair := range g[payAsset] {
-		if p.ContainPair(pair) {
+	for _, pair := range g[n.FillAssetID] {
+		if n.Contain(pair.RouteID) {
 			continue
 		}
 
-		r, err := Swap(pair, payAsset, payAmount)
+		arrived := oppositePairAsset(pair, n.FillAssetID) == fillAsset
+
+		if !arrived && n.d+1 == MaxRouteDepth {
+			continue
+		}
+
+		r, err := Swap(pair, n.FillAssetID, n.FillAmount)
 		if err != nil {
 			continue
 		}
 
-		sub := p.Sub()
-		sub.Add(r)
+		next := &node{
+			Result: r,
+			p:      n,
+			d:      n.d + 1,
+		}
 
-		g.Route(sub, r.FillAssetID, fillAsset, r.FillAmount)
-	}
-}
-
-func (g Graph) ReverseRoute(p *Path, payAsset, fillAsset string, fillAmount decimal.Decimal) {
-	if payAsset == fillAsset {
-		return
-	}
-
-	if p.Depth() >= MaxRouteDepth {
-		return
-	}
-
-	for _, pair := range g[fillAsset] {
-		if p.ContainPair(pair) {
+		if !arrived {
+			next.route(g, fillAsset, best)
 			continue
 		}
 
-		r, err := ReverseSwap(pair, fillAsset, fillAmount)
+		if next.Cmp(best) > 0 {
+			*best = *next
+		}
+	}
+}
+
+func (n *node) reverseRoute(g Graph, payAsset string, best *node) {
+	if n.d >= MaxRouteDepth {
+		return
+	}
+
+	for _, pair := range g[n.PayAssetID] {
+		if n.Contain(pair.RouteID) {
+			continue
+		}
+
+		arrived := oppositePairAsset(pair, n.PayAssetID) == payAsset
+		if !arrived && n.d+1 == MaxRouteDepth {
+			continue
+		}
+
+		r, err := ReverseSwap(pair, n.PayAssetID, n.PayAmount)
 		if err != nil {
 			continue
 		}
 
-		sub := p.Sub()
-		sub.Add(r)
+		next := &node{
+			Result: r,
+			p:      n,
+			d:      n.d + 1,
+		}
 
-		g.ReverseRoute(sub, payAsset, r.PayAssetID, r.PayAmount)
+		if !arrived {
+			next.reverseRoute(g, payAsset, best)
+			continue
+		}
+
+		if next.ReverseCmp(best) > 0 {
+			*best = *next
+		}
 	}
 }
 
@@ -165,28 +164,21 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 		g.AddPair(pair)
 	}
 
-	root := &Path{}
-	g.Route(root, payAssetID, fillAssetID, payAmount)
+	best := &node{Result: &Result{}}
+	root := &node{
+		Result: &Result{
+			FillAssetID: payAssetID,
+			FillAmount:  payAmount,
+		},
+	}
 
-	paths := root.ListAllPaths(func(p *Path) bool {
-		last, ok := p.Last()
-		return ok && last.FillAssetID == fillAssetID
-	})
-
-	if len(paths) == 0 {
+	root.route(g, fillAssetID, best)
+	if best.d == 0 {
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	sort.Slice(paths, func(i, j int) bool {
-		li, _ := paths[i].Last()
-		lj, _ := paths[j].Last()
-		return li.FillAmount.GreaterThan(lj.FillAmount)
-	})
-
-	best := paths[0]
-
 	order := &Order{}
-	ids := make([]int64, 0, best.Depth())
+	ids := make([]int64, 0, best.d)
 	for idx, r := range best.Results(false) {
 		if idx == 0 {
 			order.PayAssetID = r.PayAssetID
@@ -210,28 +202,21 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		g.AddPair(pair)
 	}
 
-	root := &Path{}
-	g.ReverseRoute(root, payAssetID, fillAssetID, fillAmount)
+	best := &node{Result: &Result{PayAmount: decimal.NewFromInt(math.MaxInt64)}}
+	root := &node{
+		Result: &Result{
+			PayAssetID: fillAssetID,
+			PayAmount:  fillAmount,
+		},
+	}
 
-	paths := root.ListAllPaths(func(p *Path) bool {
-		last, ok := p.Last()
-		return ok && last.PayAssetID == payAssetID
-	})
-
-	if len(paths) == 0 {
+	root.reverseRoute(g, payAssetID, best)
+	if best.d == 0 {
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	sort.Slice(paths, func(i, j int) bool {
-		li, _ := paths[i].Last()
-		lj, _ := paths[j].Last()
-		return li.PayAmount.LessThan(lj.PayAmount)
-	})
-
-	best := paths[0]
-
 	order := &Order{}
-	ids := make([]int64, 0, best.Depth())
+	ids := make([]int64, 0, best.d)
 	for idx, r := range best.Results(true) {
 		if idx == 0 {
 			order.PayAssetID = r.PayAssetID
@@ -247,4 +232,25 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 
 	order.Routes = EncodeRoutes(ids)
 	return order, nil
+}
+
+func cmpDepth(a, b int) int {
+	if a < b {
+		return 1
+	} else if a > b {
+		return -1
+	} else {
+		return 0
+	}
+}
+
+func oppositePairAsset(pair *Pair, asset string) string {
+	switch asset {
+	case pair.BaseAssetID:
+		return pair.QuoteAssetID
+	case pair.QuoteAssetID:
+		return pair.BaseAssetID
+	default:
+		return ""
+	}
 }
