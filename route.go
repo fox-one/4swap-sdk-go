@@ -88,13 +88,12 @@ func (n *node) route(g Graph, fillAsset string, best *node) {
 		return
 	}
 
-	for _, pair := range g[n.FillAssetID] {
+	for fill, pair := range g[n.FillAssetID] {
 		if n.Contain(pair.RouteID) {
 			continue
 		}
 
-		arrived := oppositePairAsset(pair, n.FillAssetID) == fillAsset
-
+		arrived := fill == fillAsset
 		if !arrived && n.d+1 == MaxRouteDepth {
 			continue
 		}
@@ -126,12 +125,12 @@ func (n *node) reverseRoute(g Graph, payAsset string, best *node) {
 		return
 	}
 
-	for _, pair := range g[n.PayAssetID] {
+	for pay, pair := range g[n.PayAssetID] {
 		if n.Contain(pair.RouteID) {
 			continue
 		}
 
-		arrived := oppositePairAsset(pair, n.PayAssetID) == payAsset
+		arrived := pay == payAsset
 		if !arrived && n.d+1 == MaxRouteDepth {
 			continue
 		}
@@ -241,16 +240,5 @@ func cmpDepth(a, b int) int {
 		return -1
 	} else {
 		return 0
-	}
-}
-
-func oppositePairAsset(pair *Pair, asset string) string {
-	switch asset {
-	case pair.BaseAssetID:
-		return pair.QuoteAssetID
-	case pair.QuoteAssetID:
-		return pair.BaseAssetID
-	default:
-		return ""
 	}
 }
