@@ -63,7 +63,7 @@ func PreOrder(ctx context.Context, req *PreOrderReq) (*Order, error) {
 // ReadOrder return order detail by id
 // WithToken required
 func ReadOrder(ctx context.Context, id string) (*Order, error) {
-	const uri = "/api/order/{id}"
+	const uri = "/api/orders/{id}"
 	resp, err := Request(ctx).SetPathParams(map[string]string{
 		"id": id,
 	}).Get(uri)
