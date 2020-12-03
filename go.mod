@@ -9,6 +9,7 @@ require (
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/shopspring/decimal v1.2.0
 	github.com/speps/go-hashids v2.0.0+incompatible
+	github.com/spf13/cast v1.3.1
 	github.com/stretchr/testify v1.6.1
 	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
