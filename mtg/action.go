@@ -1,9 +1,9 @@
-package fswap
+package mtg
 
 import (
-	"context"
 	"crypto/ed25519"
 	"encoding/base64"
+	"time"
 
 	"github.com/fox-one/4swap-sdk-go/mtg/encoder"
 	"github.com/fox-one/mixin-sdk-go"
@@ -11,189 +11,111 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type (
-	AddLiquidityReq struct {
-		UserID      string          `json:"user_id,omitempty"`
-		Pair        *Pair           `json:"pair,omitempty"`
-		BaseAmount  decimal.Decimal `json:"base_amount,omitempty"`
-		QuoteAmount decimal.Decimal `json:"quote_amount,omitempty"`
-		// optional, default 600
-		Expire int64 `json:"expire,omitempty"`
-		// optional, default 0.01
-		Slippage decimal.Decimal `json:"slippage,omitempty"`
-	}
+type Action struct {
+	// action type, Add, Remove, Swap
+	Type TransactionType
+	// user mixin id
+	UserID string
+	// action trace id
+	FollowID string
 
-	RemoveLiquidityReq struct {
-		UserID           string          `json:"user_id,omitempty"`
-		LiquidityAssetID string          `json:"liquidity_asset_id,omitempty"`
-		Amount           decimal.Decimal `json:"amount,omitempty"`
-	}
+	// AssetID is pair quote asset id if base asset will be paid, otherwise this is base asset id.
+	// Ignore if type is Remove
+	AssetID string
 
-	TransferReq struct {
-		AssetID   string          `json:"asset_id,omitempty"`
-		Receivers []string        `json:"receivers,omitempty"`
-		Threshold uint            `json:"threshold,omitempty"`
-		TraceID   string          `json:"trace_id,omitempty"`
-		Amount    decimal.Decimal `json:"amount,omitempty"`
-		Memo      string          `json:"memo,omitempty"`
-	}
+	// Deposit Timeout, optional, default is 10m
+	Timeout time.Duration
+	// Deposit slippage, optional, default 0.01
+	Slippage decimal.Decimal
 
-	ActionResult struct {
-		FollowID  string         `json:"follow_id,omitempty"`
-		Transfers []*TransferReq `json:"transfers,omitempty"`
-	}
-)
-
-func AddLiquidity(ctx context.Context, req *AddLiquidityReq) (*ActionResult, error) {
-	userID, err := uuid.FromString(req.UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	baseAssetID, err := uuid.FromString(req.Pair.BaseAssetID)
-	if err != nil {
-		return nil, err
-	}
-
-	quoteAssetID, err := uuid.FromString(req.Pair.QuoteAssetID)
-	if err != nil {
-		return nil, err
-	}
-
-	if !req.Slippage.IsPositive() {
-		req.Slippage = decimal.NewFromFloat(0.01)
-	}
-
-	if req.Expire < 1 {
-		req.Expire = 10 * 60
-	}
-
-	followID := uuid.Must(uuid.NewV4())
-	baseMemo, err := encodeMemo(
-		int(TransactionTypeAdd),
-		userID,
-		followID,
-		quoteAssetID,
-		req.Slippage,
-		req.Expire)
-
-	if err != nil {
-		return nil, err
-	}
-
-	quoteMemo, err := encodeMemo(
-		int(TransactionTypeAdd),
-		userID,
-		followID,
-		baseAssetID,
-		req.Slippage,
-		req.Expire)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &ActionResult{
-		FollowID: followID.String(),
-		Transfers: []*TransferReq{
-			{
-				AssetID:   req.Pair.BaseAssetID,
-				Receivers: group.Members,
-				Threshold: group.Threshold,
-				TraceID:   uuid.Must(uuid.NewV4()).String(),
-				Amount:    req.BaseAmount,
-				Memo:      baseMemo,
-			},
-			{
-				AssetID:   req.Pair.QuoteAssetID,
-				Receivers: group.Members,
-				Threshold: group.Threshold,
-				TraceID:   uuid.Must(uuid.NewV4()).String(),
-				Amount:    req.QuoteAmount,
-				Memo:      quoteMemo,
-			},
-		},
-	}, nil
+	// swap routes
+	Routes string
+	// Swap minimum fill amount
+	Minimum decimal.Decimal
 }
 
-func Swap(ctx context.Context, order *Order) (*ActionResult, error) {
-	userID, err := uuid.FromString(order.UserID)
-	if err != nil {
-		return nil, err
+func AddAction(userID, followID, assetID string, timeout time.Duration, slippage decimal.Decimal) Action {
+	return Action{
+		Type:     TransactionTypeAdd,
+		UserID:   userID,
+		FollowID: followID,
+		AssetID:  assetID,
+		Timeout:  timeout,
+		Slippage: slippage,
 	}
-
-	fillAssetId, err := uuid.FromString(order.FillAssetID)
-	if err != nil {
-		return nil, err
-	}
-
-	followID := uuid.Must(uuid.NewV4())
-	memo, err := encodeMemo(
-		int(TransactionTypeSwap),
-		userID,
-		followID,
-		fillAssetId,
-		order.Routes,
-		order.MinAmount)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &ActionResult{
-		FollowID: followID.String(),
-		Transfers: []*TransferReq{
-			{
-				AssetID:   order.PayAssetID,
-				Receivers: group.Members,
-				Threshold: group.Threshold,
-				TraceID:   followID.String(),
-				Amount:    order.PayAmount,
-				Memo:      memo,
-			},
-		},
-	}, nil
 }
 
-func RemoveLiquidity(ctx context.Context, req *RemoveLiquidityReq) (*ActionResult, error) {
-	userID, err := uuid.FromString(req.UserID)
-	if err != nil {
-		return nil, err
+func SwapAction(userID, followID, assetID string, routes string, min decimal.Decimal) Action {
+	return Action{
+		Type:     TransactionTypeSwap,
+		UserID:   userID,
+		FollowID: followID,
+		AssetID:  assetID,
+		Routes:   routes,
+		Minimum:  min,
 	}
-
-	followID := uuid.Must(uuid.NewV4())
-	memo, err := encodeMemo(
-		int(TransactionTypeRemove),
-		userID,
-		followID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ActionResult{
-		FollowID: followID.String(),
-		Transfers: []*TransferReq{
-			{
-				AssetID:   req.LiquidityAssetID,
-				Receivers: group.Members,
-				Threshold: group.Threshold,
-				TraceID:   followID.String(),
-				Amount:    req.Amount,
-				Memo:      memo,
-			},
-		},
-	}, nil
 }
 
-func encodeMemo(values ...interface{}) (string, error) {
+func RemoveAction(userID, followID string) Action {
+	return Action{
+		Type:     TransactionTypeRemove,
+		UserID:   userID,
+		FollowID: followID,
+	}
+}
+
+func (action Action) Encode(publicKey ed25519.PublicKey) (string, error) {
+	return EncodeAction(action, publicKey)
+}
+
+func EncodeAction(action Action, publicKey ed25519.PublicKey) (string, error) {
+	userID, err := uuid.FromString(action.UserID)
+	if err != nil {
+		return "", err
+	}
+
+	followID, err := uuid.FromString(action.FollowID)
+	if err != nil {
+		return "", err
+	}
+
+	values := []interface{}{int(action.Type), userID, followID}
+
+	switch action.Type {
+	case TransactionTypeAdd:
+		asset, err := uuid.FromString(action.AssetID)
+		if err != nil {
+			return "", err
+		}
+
+		if action.Timeout >= time.Second {
+			action.Timeout = 10 * time.Minute
+		}
+
+		if !action.Slippage.IsPositive() {
+			action.Slippage = decimal.New(1, -2)
+		}
+
+		values = append(values, asset, int64(action.Timeout.Seconds()), action.Slippage)
+	case TransactionTypeSwap:
+		asset, err := uuid.FromString(action.AssetID)
+		if err != nil {
+			return "", err
+		}
+
+		values = append(values, asset, action.Routes, action.Minimum)
+	}
+
+	return encodeMemo(publicKey, values...)
+}
+
+func encodeMemo(pub ed25519.PublicKey, values ...interface{}) (string, error) {
 	action, err := encoder.Encode(values...)
 	if err != nil {
 		return "", err
 	}
 
 	key := mixin.GenerateEd25519Key()
-	var pub ed25519.PublicKey
-	copy(pub[:], group.PublicKey[:])
 	action, err = encoder.Encrypt(action, key, pub)
 	if err != nil {
 		return "", err

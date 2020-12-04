@@ -12,6 +12,8 @@ import (
 const (
 	Endpoint = "https://f1-uniswap-api.firesbox.com"
 	ClientID = "a753e0eb-3010-4c4a-a7b2-a7bda4063f62"
+
+	MtgEndpoint = "https://swap-mtg-test-api.fox.one"
 )
 
 var httpClient = resty.New().
@@ -25,6 +27,10 @@ var httpClient = resty.New().
 
 		return nil
 	})
+
+func UseEndpoint(endpoint string) {
+	httpClient.SetHostURL(endpoint)
+}
 
 func Request(ctx context.Context) *resty.Request {
 	return httpClient.R().SetContext(ctx)

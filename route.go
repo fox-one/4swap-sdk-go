@@ -181,12 +181,12 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 	for idx, r := range best.Results(false) {
 		if idx == 0 {
 			order.PayAssetID = r.PayAssetID
-			order.Funds = r.PayAmount
+			order.PayAmount = r.PayAmount
 			order.RouteAssets = append(order.RouteAssets, order.PayAssetID)
 		}
 
 		order.FillAssetID = r.FillAssetID
-		order.Amount = r.FillAmount
+		order.FillAmount = r.FillAmount
 		order.RouteAssets = append(order.RouteAssets, order.FillAssetID)
 		ids = append(ids, r.RouteID)
 	}
@@ -219,12 +219,12 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 	for idx, r := range best.Results(true) {
 		if idx == 0 {
 			order.PayAssetID = r.PayAssetID
-			order.Funds = r.PayAmount
+			order.PayAmount = r.PayAmount
 			order.RouteAssets = append(order.RouteAssets, order.PayAssetID)
 		}
 
 		order.FillAssetID = r.FillAssetID
-		order.Amount = r.FillAmount
+		order.FillAmount = r.FillAmount
 		order.RouteAssets = append(order.RouteAssets, order.FillAssetID)
 		ids = append(ids, r.RouteID)
 	}

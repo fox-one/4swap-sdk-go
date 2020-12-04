@@ -23,7 +23,7 @@ func TestRoute(t *testing.T) {
 			return
 		}
 
-		t.Log(order.Funds, order.Amount, order.RouteAssets, order.Routes)
+		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
 
 	t.Run("0.1 xin", func(t *testing.T) {
@@ -33,7 +33,7 @@ func TestRoute(t *testing.T) {
 			return
 		}
 
-		t.Log(order.Funds, order.Amount, order.RouteAssets, order.Routes)
+		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
 
 	t.Run("1 xin", func(t *testing.T) {
@@ -43,7 +43,7 @@ func TestRoute(t *testing.T) {
 			return
 		}
 
-		t.Log(order.Funds, order.Amount, order.RouteAssets, order.Routes)
+		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
 }
 
@@ -65,7 +65,7 @@ func TestReverseRoute(t *testing.T) {
 			return
 		}
 
-		t.Log(order.Funds, order.Amount, order.RouteAssets, order.Routes)
+		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
 
 	t.Run("0.01 btc", func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestReverseRoute(t *testing.T) {
 			return
 		}
 
-		t.Log(order.Funds, order.Amount, order.RouteAssets, order.Routes)
+		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
 
 	t.Run("0.1 btc", func(t *testing.T) {
@@ -85,7 +85,7 @@ func TestReverseRoute(t *testing.T) {
 			return
 		}
 
-		t.Log(order.Funds, order.Amount, order.RouteAssets, order.Routes)
+		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
 
 	t.Run("1 btc", func(t *testing.T) {
@@ -95,6 +95,6 @@ func TestReverseRoute(t *testing.T) {
 			return
 		}
 
-		t.Log(order.Funds, order.Amount, order.RouteAssets, order.Routes)
+		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
 }

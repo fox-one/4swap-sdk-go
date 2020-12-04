@@ -58,7 +58,7 @@ func SimpleExample() {
 		log.Panicf("pre order failed: %s", err)
 	}
 
-	log.Printf("fill amount %s", pre.Amount)
+	log.Printf("fill amount %s", pre.FillAmount)
 
 	// 准备转账下单
 	action := fswap.TransactionAction{
@@ -66,7 +66,7 @@ func SimpleExample() {
 		Routes: pre.Routes,
 		// 最小买入量设置成预估买入量的 98%
 		// 如果想加大兑换成功率，这个滑点可以设置得低一点
-		Minimum: pre.Amount.Mul(decimal.NewFromFloat(0.98)).Truncate(8).String(),
+		Minimum: pre.FillAmount.Mul(decimal.NewFromFloat(0.98)).Truncate(8).String(),
 	}
 
 	memo := fswap.EncodeAction(action)
