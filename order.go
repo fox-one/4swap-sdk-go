@@ -22,7 +22,6 @@ type Order struct {
 	FillAssetID string          `json:"fill_asset_id,omitempty"`
 	FillAmount  decimal.Decimal `json:"fill_amount,omitempty"`
 	MinAmount   decimal.Decimal `json:"min_amount,omitempty"`
-	PriceImpact decimal.Decimal `json:"price_impact,omitempty"`
 	RouteAssets []string        `json:"route_assets,omitempty"`
 	// route id
 	Routes string `json:"routes,omitempty"`

@@ -2,42 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="18d99b8a-593c-4428-816f-af00663ffff8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/4swap_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/4swap_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/action.go" beforeDir="false" afterPath="$PROJECT_DIR$/mtg/action.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/action_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/asset.go" beforeDir="false" afterPath="$PROJECT_DIR$/asset.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/asset_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/asset_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/auth.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/context.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/deposit.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/endpoint.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/endpoint_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/error.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/group.go" beforeDir="false" afterPath="$PROJECT_DIR$/group.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/group_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/group_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/number.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/order.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/order_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/pagination.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/pair.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/pair_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/preorder.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/request.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/route.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/routes/hash.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/routes/routes.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/routes/routes_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/swap.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/transaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/mtg/transaction.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/transaction_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mtg/transactiontype_string.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/order.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/request.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route.go" beforeDir="false" afterPath="$PROJECT_DIR$/route.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/route_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
