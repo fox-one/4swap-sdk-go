@@ -14,32 +14,45 @@ const (
 )
 
 type Order struct {
-	ID         string    `json:"id,omitempty"`
-	CreatedAt  time.Time `json:"created_at,omitempty"`
-	State      string    `json:"state,omitempty"`
-	PayAssetID string    `json:"pay_asset_id,omitempty"`
-	// pay amount
-	Funds       decimal.Decimal `json:"funds,omitempty"`
+	ID          string          `json:"id,omitempty"`
+	CreatedAt   time.Time       `json:"created_at,omitempty"`
+	State       string          `json:"state,omitempty"`
+	PayAssetID  string          `json:"pay_asset_id,omitempty"`
+	PayAmount   decimal.Decimal `json:"pay_amount,omitempty"`
 	FillAssetID string          `json:"fill_asset_id,omitempty"`
-	// fill amount
-	Amount decimal.Decimal `json:"amount,omitempty"`
-	// 最少购买量
+	FillAmount  decimal.Decimal `json:"fill_amount,omitempty"`
 	MinAmount   decimal.Decimal `json:"min_amount,omitempty"`
-	PriceImpact decimal.Decimal `json:"price_impact,omitempty"`
 	RouteAssets []string        `json:"route_assets,omitempty"`
 	// route id
 	Routes string `json:"routes,omitempty"`
+
+	// deprecated, Use PayAmount instead
+	Funds decimal.Decimal `json:"funds,omitempty"`
+	// deprecated, Use FillAmount instead
+	Amount decimal.Decimal `json:"amount,omitempty"`
 }
 
 type PreOrderReq struct {
 	PayAssetID  string `json:"pay_asset_id,omitempty"`
 	FillAssetID string `json:"fill_asset_id,omitempty"`
-	// funds 和 amount 二选一
+	// pay amount 和 fill amount 二选一
+	PayAmount  decimal.Decimal `json:"pay_amount,omitempty"`
+	FillAmount decimal.Decimal `json:"fill_amount,omitempty"`
+	// deprecated
 	Funds  decimal.Decimal `json:"funds,omitempty"`
 	Amount decimal.Decimal `json:"amount,omitempty"`
-
 	// deprecated
 	MinAmount decimal.Decimal `json:"min_amount,omitempty"`
+}
+
+func (req *PreOrderReq) fixDeprecated() {
+	if req.Funds.IsPositive() {
+		req.PayAmount = req.Funds
+	}
+
+	if req.Amount.IsPositive() {
+		req.FillAmount = req.Amount
+	}
 }
 
 // PreOrder 预下单
@@ -53,11 +66,28 @@ func PreOrder(ctx context.Context, req *PreOrderReq) (*Order, error) {
 		return nil, err
 	}
 
-	if req.Funds.IsPositive() {
-		return Route(pairs, req.PayAssetID, req.FillAssetID, req.Funds)
+	return PreOrderWithPairs(pairs, req)
+}
+
+func PreOrderWithPairs(pairs []*Pair, req *PreOrderReq) (*Order, error) {
+	var (
+		order *Order
+		err   error
+	)
+
+	req.fixDeprecated()
+	if req.PayAmount.IsPositive() {
+		order, err = Route(pairs, req.PayAssetID, req.FillAssetID, req.PayAmount)
+	} else {
+		order, err = ReverseRoute(pairs, req.PayAssetID, req.FillAssetID, req.FillAmount)
 	}
 
-	return ReverseRoute(pairs, req.PayAssetID, req.FillAssetID, req.Amount)
+	if err != nil {
+		return nil, err
+	}
+
+	order.fixDeprecated()
+	return order, nil
 }
 
 // ReadOrder return order detail by id
@@ -76,5 +106,16 @@ func ReadOrder(ctx context.Context, id string) (*Order, error) {
 		return nil, err
 	}
 
+	order.fixDeprecated()
 	return &order, nil
+}
+
+func (order *Order) fixDeprecated() {
+	if order.PayAmount.IsPositive() {
+		order.Funds = order.PayAmount
+		order.Amount = order.FillAmount
+	} else {
+		order.PayAmount = order.Funds
+		order.FillAmount = order.Amount
+	}
 }
