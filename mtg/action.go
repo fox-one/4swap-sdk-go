@@ -96,7 +96,7 @@ func EncodeAction(action Action, publicKey ed25519.PublicKey) (string, error) {
 			action.Slippage = decimal.New(1, -2)
 		}
 
-		values = append(values, asset, int64(action.Timeout.Seconds()), action.Slippage)
+		values = append(values, asset, action.Slippage, int64(action.Timeout.Seconds()))
 	case TransactionTypeSwap:
 		asset, err := uuid.FromString(action.AssetID)
 		if err != nil {
