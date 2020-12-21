@@ -12,7 +12,7 @@
 
 ```json5
 {
-    "t": "Add", // action type
+    "t": "Swap", // action type
     "a": "66152c0b-3355-38ef-9ec5-cae97e29472a", // fill asset id,
     "r": "xxx", // route id ，可以由 pre order 得到，不传的话则由引擎自动选择最优路径
     "m": "0.001" // 最小买入量，不传的话则不限制
