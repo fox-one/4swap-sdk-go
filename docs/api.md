@@ -1,10 +1,12 @@
 # 4swap 程序交易接入文档
 
-1. api base 是 **https://f1-uniswap-api.firesbox.com/api**
+1. 4swap 普通版本 api base 是 **https://f1-uniswap-api.firesbox.com/api**
 
-2. 4swap 机器人的 mixin id 是 a753e0eb-3010-4c4a-a7b2-a7bda4063f62
+2. 4swap mtg 版本 api base 是 **https://f1-mtgswap-api.firesbox.com/api**
 
-3. 需要授权的接口，请在 header Authorization 带上 [mixin authorization token](https://developers.mixin.one/api/a-beginning/authentication-token)，要求签名的 url 是 **/me**，然后 scope 是 **FULL**。
+3. 4swap 机器人的 mixin id 是 a753e0eb-3010-4c4a-a7b2-a7bda4063f62
+
+4. 需要授权的接口，请在 header Authorization 带上 [mixin authorization token](https://developers.mixin.one/api/a-beginning/authentication-token)，要求签名的 url 是 **/me**，然后 scope 是 **FULL**。
 
 ## 下单 Swap 转账
 
