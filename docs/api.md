@@ -307,8 +307,10 @@ GET /orders/{order_id}
     "state": "Done", // 订单状态 Trading Rejected Done
     "pay_asset_id": "6cfe566e-4aad-470b-8c9a-2fd35b49c68d",
     "fill_asset_id": "c6d0c728-2624-429b-8e0d-d9d19b6592fa",
-    "funds": "1", // 付款的币的数量
-    "amount": "0.00025725", // 买到的币的数量
+    "pay_amount": "1", // 付款的币的数量
+    "funds": "1", // deprecated, same as pay_amount
+    "fill_amount": "00025725", // 买到的币的数量
+    "amount": "0.00025725", // deprecated, same as fill_amount
     "min_amount": "0.0002521",
     "routes": "1bv",
     "route_assets": [
