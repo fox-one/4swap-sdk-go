@@ -19,6 +19,14 @@ func EncodeRoutes(ids []int64) string {
 	return id
 }
 
+func DecodeRoutes(id string) []int64 {
+	hd := hashids.NewData()
+	hd.Salt = "uniswap routes"
+	h, _ := hashids.NewWithData(hd)
+	ids, _ := h.DecodeInt64WithError(id)
+	return ids
+}
+
 type Graph map[string]map[string]*Pair
 
 func (g Graph) Add(pay, fill string, pair *Pair) {
