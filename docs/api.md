@@ -66,7 +66,8 @@ GET /pairs
         "base_amount": "21416602.86502364",
         "quote_amount": "0.33923379",
         "fee_percent": "0.003",
-        "liquidity": "2695.28124196"
+        "liquidity": "2695.28124196",
+        "swap_method": "curve"
       },
       {
         "base_asset_id": "3edb734c-6d6f-32ff-ab03-4eb43640c758",

@@ -10,6 +10,7 @@ func TestRoute(t *testing.T) {
 	payAssetID := "c94ac88f-4671-3976-b60a-09064f1811e8"
 	fillAssetID := "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
 
+	UseEndpoint(MtgEndpoint)
 	pairs, err := ListPairs(ctx)
 	if err != nil {
 		t.Error("ListPairs", err)
@@ -52,6 +53,7 @@ func TestReverseRoute(t *testing.T) {
 	payAssetID := "c94ac88f-4671-3976-b60a-09064f1811e8"
 	fillAssetID := "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
 
+	UseEndpoint(MtgEndpoint)
 	pairs, err := ListPairs(ctx)
 	if err != nil {
 		t.Error("ListPairs", err)
