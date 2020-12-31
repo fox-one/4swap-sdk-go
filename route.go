@@ -9,11 +9,12 @@ import (
 
 const (
 	MaxRouteDepth = 4
+	routeSalt     = "uniswap routes"
 )
 
 func EncodeRoutes(ids []int64) string {
 	hd := hashids.NewData()
-	hd.Salt = "uniswap routes"
+	hd.Salt = routeSalt
 	h, _ := hashids.NewWithData(hd)
 	id, _ := h.EncodeInt64(ids)
 	return id
@@ -21,7 +22,7 @@ func EncodeRoutes(ids []int64) string {
 
 func DecodeRoutes(id string) []int64 {
 	hd := hashids.NewData()
-	hd.Salt = "uniswap routes"
+	hd.Salt = routeSalt
 	h, _ := hashids.NewWithData(hd)
 	ids, _ := h.DecodeInt64WithError(id)
 	return ids
