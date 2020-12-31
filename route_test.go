@@ -2,6 +2,7 @@ package fswap
 
 import (
 	"context"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -97,4 +98,12 @@ func TestReverseRoute(t *testing.T) {
 
 		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
+}
+
+func TestDecodeRoutes(t *testing.T) {
+	routes := []int64{173, 171, 1, 2, 10}
+	routeId := EncodeRoutes(routes)
+	decodeRoutes := DecodeRoutes(routeId)
+	assert.Equal(t, routes, decodeRoutes)
+	t.Log(routes, routeId, decodeRoutes)
 }
