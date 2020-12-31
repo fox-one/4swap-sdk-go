@@ -8,8 +8,6 @@ import (
 )
 
 var (
-	SwapFee = Decimal("0.003")
-
 	ErrInsufficientLiquiditySwapped = errors.New("insufficient liquidity swapped")
 )
 
@@ -34,7 +32,7 @@ func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, er
 		PayAssetID: payAssetID,
 		PayAmount:  payAmount,
 		FeeAssetID: payAssetID,
-		FeeAmount:  payAmount.Mul(SwapFee).Truncate(8),
+		FeeAmount:  payAmount.Mul(pair.FeePercent).Truncate(8),
 		RouteID:    pair.RouteID,
 	}
 
@@ -87,10 +85,10 @@ func ReverseSwap(pair *Pair, fillAssetID string, fillAmount decimal.Decimal) (*R
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	r.PayAmount = r.PayAmount.Div(decimal.NewFromInt(1).Sub(SwapFee))
+	r.PayAmount = r.PayAmount.Div(decimal.NewFromInt(1).Sub(pair.FeePercent))
 	r.PayAmount = Ceil(r.PayAmount, 8)
 	r.FeeAssetID = r.PayAssetID
-	r.FeeAmount = r.PayAmount.Mul(SwapFee).Truncate(8)
+	r.FeeAmount = r.PayAmount.Mul(pair.FeePercent).Truncate(8)
 
 	return r, nil
 }
