@@ -3,11 +3,12 @@ package fswap
 import (
 	"errors"
 
+	"github.com/fox-one/4swap-sdk-go/swap"
 	"github.com/shopspring/decimal"
 )
 
 var (
-	SwapFee = "0.003"
+	SwapFee = Decimal("0.003")
 
 	ErrInsufficientLiquiditySwapped = errors.New("insufficient liquidity swapped")
 )
@@ -25,10 +26,7 @@ type Result struct {
 
 // Swap trade in a pair
 func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, error) {
-	K := pair.BaseAmount.Mul(pair.QuoteAmount)
-	if !K.IsPositive() {
-		return nil, ErrInsufficientLiquiditySwapped
-	}
+	m := swap.Imp(pair.SwapMethod)
 
 	payAmount = payAmount.Truncate(8)
 
@@ -36,7 +34,7 @@ func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, er
 		PayAssetID: payAssetID,
 		PayAmount:  payAmount,
 		FeeAssetID: payAssetID,
-		FeeAmount:  payAmount.Mul(Decimal(SwapFee)).Truncate(8),
+		FeeAmount:  payAmount.Mul(SwapFee).Truncate(8),
 		RouteID:    pair.RouteID,
 	}
 
@@ -47,15 +45,11 @@ func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, er
 
 	switch payAssetID {
 	case pair.BaseAssetID:
-		newBase := pair.BaseAmount.Add(funds)
-		newQuote := K.Div(newBase)
 		r.FillAssetID = pair.QuoteAssetID
-		r.FillAmount = pair.QuoteAmount.Sub(newQuote).Truncate(8)
+		r.FillAmount = m.Swap(pair.BaseAmount, pair.QuoteAmount, funds).Truncate(8)
 	case pair.QuoteAssetID:
-		newQuote := pair.QuoteAmount.Add(funds)
-		newBase := K.Div(newQuote)
 		r.FillAssetID = pair.BaseAssetID
-		r.FillAmount = pair.BaseAmount.Sub(newBase).Truncate(8)
+		r.FillAmount = m.Swap(pair.QuoteAmount, pair.BaseAmount, funds).Truncate(8)
 	default:
 		return nil, errors.New("invalid pay asset id")
 	}
@@ -65,10 +59,7 @@ func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, er
 
 // ReverseSwap is a Reverse version of Swap
 func ReverseSwap(pair *Pair, fillAssetID string, fillAmount decimal.Decimal) (*Result, error) {
-	K := pair.BaseAmount.Mul(pair.QuoteAmount)
-	if !K.IsPositive() {
-		return nil, ErrInsufficientLiquiditySwapped
-	}
+	m := swap.Imp(pair.SwapMethod)
 
 	fillAmount = fillAmount.Truncate(8)
 	if !fillAmount.IsPositive() {
@@ -83,31 +74,23 @@ func ReverseSwap(pair *Pair, fillAssetID string, fillAmount decimal.Decimal) (*R
 
 	switch fillAssetID {
 	case pair.BaseAssetID:
-		newBase := pair.BaseAmount.Sub(fillAmount)
-		if !newBase.IsPositive() {
-			return nil, ErrInsufficientLiquiditySwapped
-		}
-
-		newQuote := K.Div(newBase)
 		r.PayAssetID = pair.QuoteAssetID
-		r.PayAmount = newQuote.Sub(pair.QuoteAmount)
+		r.PayAmount = m.Reverse(pair.QuoteAmount, pair.BaseAmount, fillAmount)
 	case pair.QuoteAssetID:
-		newQuote := pair.QuoteAmount.Sub(fillAmount)
-		if !newQuote.IsPositive() {
-			return nil, ErrInsufficientLiquiditySwapped
-		}
-
-		newBase := K.Div(newQuote)
 		r.PayAssetID = pair.BaseAssetID
-		r.PayAmount = newBase.Sub(pair.BaseAmount)
+		r.PayAmount = m.Reverse(pair.BaseAmount, pair.QuoteAmount, fillAmount)
 	default:
 		return nil, errors.New("invalid fill asset id")
 	}
 
-	r.PayAmount = r.PayAmount.Div(decimal.NewFromInt(1).Sub(Decimal(SwapFee)))
+	if !r.PayAmount.IsPositive() {
+		return nil, ErrInsufficientLiquiditySwapped
+	}
+
+	r.PayAmount = r.PayAmount.Div(decimal.NewFromInt(1).Sub(SwapFee))
 	r.PayAmount = Ceil(r.PayAmount, 8)
 	r.FeeAssetID = r.PayAssetID
-	r.FeeAmount = r.PayAmount.Mul(Decimal(SwapFee)).Truncate(8)
+	r.FeeAmount = r.PayAmount.Mul(SwapFee).Truncate(8)
 
 	return r, nil
 }
