@@ -3,6 +3,7 @@ module github.com/fox-one/4swap-sdk-go
 go 1.15
 
 require (
+	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8
 	github.com/fox-one/mixin-sdk-go v1.2.3
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/gofrs/uuid v3.3.0+incompatible

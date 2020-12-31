@@ -2,6 +2,7 @@ package fswap
 
 import (
 	"context"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -10,6 +11,7 @@ func TestRoute(t *testing.T) {
 	payAssetID := "c94ac88f-4671-3976-b60a-09064f1811e8"
 	fillAssetID := "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
 
+	UseEndpoint(MtgEndpoint)
 	pairs, err := ListPairs(ctx)
 	if err != nil {
 		t.Error("ListPairs", err)
@@ -52,6 +54,7 @@ func TestReverseRoute(t *testing.T) {
 	payAssetID := "c94ac88f-4671-3976-b60a-09064f1811e8"
 	fillAssetID := "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
 
+	UseEndpoint(MtgEndpoint)
 	pairs, err := ListPairs(ctx)
 	if err != nil {
 		t.Error("ListPairs", err)
@@ -97,4 +100,12 @@ func TestReverseRoute(t *testing.T) {
 
 		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
 	})
+}
+
+func TestDecodeRoutes(t *testing.T) {
+	routes := []int64{173, 171, 1, 2, 10}
+	routeId := EncodeRoutes(routes)
+	decodeRoutes := DecodeRoutes(routeId)
+	assert.Equal(t, routes, decodeRoutes)
+	t.Log(routes, routeId, decodeRoutes)
 }

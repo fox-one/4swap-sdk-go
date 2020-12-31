@@ -2,7 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="18d99b8a-593c-4428-816f-af00663ffff8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/swap/curve/curve.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/swap/interface.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/swap/uni/uni.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/api.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/api.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pair.go" beforeDir="false" afterPath="$PROJECT_DIR$/pair.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/route_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/route_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swap.go" beforeDir="false" afterPath="$PROJECT_DIR$/swap.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,15 +49,18 @@
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="js.buildTools.gulp.gulp_package_dir" value="" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestReadGroup in github.com/fox-one/4swap-sdk-go/mtg">
+  <component name="RunManager" selected="Go Test.TestReverseRoute in github.com/fox-one/4swap-sdk-go">
     <configuration name="TestAddDeposit in github.com/fox-one/4swap-sdk-go/mtg" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="4swap-sdk-go" />
       <working_directory value="$PROJECT_DIR$/mtg" />
@@ -114,10 +127,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestReadGroup in github.com/fox-one/4swap-sdk-go/mtg" />
-        <item itemvalue="Go Test.TestAddDeposit in github.com/fox-one/4swap-sdk-go/mtg" />
         <item itemvalue="Go Test.TestReverseRoute in github.com/fox-one/4swap-sdk-go" />
         <item itemvalue="Go Test.TestRoute in github.com/fox-one/4swap-sdk-go" />
+        <item itemvalue="Go Test.TestReadGroup in github.com/fox-one/4swap-sdk-go/mtg" />
+        <item itemvalue="Go Test.TestAddDeposit in github.com/fox-one/4swap-sdk-go/mtg" />
         <item itemvalue="Go Test.TestRoute/0.1_xin in github.com/fox-one/4swap-sdk-go" />
       </list>
     </recent_temporary>

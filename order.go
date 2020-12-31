@@ -40,8 +40,8 @@ type PreOrderReq struct {
 	FillAmount decimal.Decimal `json:"fill_amount,omitempty"`
 	// deprecated
 	Funds  decimal.Decimal `json:"funds,omitempty"`
-	Amount decimal.Decimal `json:"amount,omitempty"`
 	// deprecated
+	Amount decimal.Decimal `json:"amount,omitempty"`
 	MinAmount decimal.Decimal `json:"min_amount,omitempty"`
 }
 
