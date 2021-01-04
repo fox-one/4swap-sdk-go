@@ -17,6 +17,6 @@ func main() {
 	y, _ := decimal.NewFromString(args[2])
 
 	dx, _ := decimal.NewFromString(args[3])
-	dy := imp.Swap(x, y, dx)
+	dy := imp.Swap(x, y, dx).Truncate(8)
 	_, _ = fmt.Fprint(os.Stdout, dy.String())
 }
