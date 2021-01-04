@@ -64,7 +64,7 @@ func (m Swap) getD(xp []decimal.Decimal) decimal.Decimal {
 	for range iter.N(255) {
 		_dp := d
 		for _, _x := range xp {
-			_dp = _dp.Mul(d).Div(_x.Mul(nCoins).Add(one))
+			_dp = _dp.Mul(d).Div(_x.Mul(nCoins))
 		}
 
 		dp = d
