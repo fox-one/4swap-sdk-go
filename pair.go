@@ -18,6 +18,7 @@ type Pair struct {
 	// 我的流动性份额，需要 WithToken
 	Share      decimal.Decimal `json:"share,omitempty"`
 	SwapMethod string          `json:"swap_method,omitempty"`
+	Version    int64           `json:"version,omitempty"`
 }
 
 func (pair *Pair) reverse() {
