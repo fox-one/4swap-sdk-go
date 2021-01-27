@@ -19,11 +19,16 @@ type Pair struct {
 	Share      decimal.Decimal `json:"share,omitempty"`
 	SwapMethod string          `json:"swap_method,omitempty"`
 	Version    int64           `json:"version,omitempty"`
+	// volume
+	Volume24h      decimal.Decimal `json:"volume_24h,omitempty"`
+	BaseVolume24h  decimal.Decimal `json:"base_volume_24h,omitempty"`
+	QuoteVolume24h decimal.Decimal `json:"quote_volume_24h,omitempty"`
 }
 
 func (pair *Pair) reverse() {
 	pair.BaseAssetID, pair.QuoteAssetID = pair.QuoteAssetID, pair.BaseAssetID
 	pair.BaseAmount, pair.QuoteAmount = pair.QuoteAmount, pair.BaseAmount
+	pair.BaseVolume24h, pair.QuoteVolume24h = pair.QuoteVolume24h, pair.BaseVolume24h
 }
 
 // ReadPair return pair detail by base asset id & quote asset id
