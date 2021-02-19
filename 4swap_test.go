@@ -3,8 +3,12 @@ package fswap_test
 import (
 	"context"
 	"log"
+	"testing"
 
 	fswap "github.com/fox-one/4swap-sdk-go"
+	"github.com/fox-one/4swap-sdk-go/mtg"
+	"github.com/fox-one/mixin-sdk-go"
+	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
 )
 
@@ -79,4 +83,52 @@ func SimpleExample() {
 	}
 
 	log.Println("handle swap transfer", transfer.TraceID)
+}
+
+func TestMtgSwap(t *testing.T) {
+	const (
+		btc   = "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
+		xin   = "c94ac88f-4671-3976-b60a-09064f1811e8"
+		token = "your authorization token"
+	)
+
+	ctx := context.Background()
+	fswap.UseEndpoint(fswap.MtgEndpoint)
+
+	group, err := fswap.ReadGroup(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	me, err := mixin.UserMe(ctx, token)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	followID, _ := uuid.NewV4()
+	action := mtg.SwapAction(
+		me.UserID,
+		followID.String(),
+		btc,
+		"", // routes 为空则不指定
+		decimal.NewFromFloat(0.1),
+	)
+
+	memo, err := action.Encode(group.PublicKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(memo)
+
+	// 使用 mixin-sdk-go 或者 bot-api-client-go 转给给 4swap 多签
+
+	// 查询订单
+	ctx = fswap.WithToken(ctx, token)
+	order, err := fswap.ReadOrder(ctx, followID.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(order.State)
 }
