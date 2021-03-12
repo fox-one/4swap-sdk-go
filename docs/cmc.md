@@ -1,4 +1,4 @@
-* endpoint is **https://api.4swap.org/**
+* endpoint is [https://api.4swap.org](https://api.4swap.org/api/cmc/pairs)
 
 ##  List cmc Pairs
 
