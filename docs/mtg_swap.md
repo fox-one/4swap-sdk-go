@@ -130,3 +130,16 @@ GET /api/orders/{follow_id}
   }
 }
 ```
+
+## 收款
+
+> 买到或者退款的币将从多签钱包直接转给收款账户
+
+### Memo 格式
+
+```json5
+{
+  "s": "4swapTrade", // 4swapTrade: 兑换成功 4swapRefund: 交易失败，退款
+  "t": "bf0c984d-7f8a-424e-bddd-473fcf5f7020", // follow id
+}
+```
