@@ -3,8 +3,9 @@
 4swap mtg 兑换步骤：
 
 1. 获取多签组收款地址
-2. 下单转账给多签收款地址
-3. 查询订单，收款
+2. 查看交易对深度  
+3. 下单转账给多签收款地址
+4. 查询订单，收款
 
 ## 获取 4swap mtg 多签收款地址
 
@@ -34,6 +35,48 @@ GET /api/info
     "public_key": "dt351xp3KjNlVCMqBYUeUSF45upCEiReSZAqcjcP/Lc=",
     "threshold": 3
   }
+}
+```
+
+## 读取交易对信息
+
+```http request
+GET /api/pairs
+```
+
+**Response:**
+
+```json5
+{
+    "data": {
+        "pairs": [
+            {
+                "base_amount": "414.47452418", // 流动池中 base asset 的数量
+                "base_asset_id": "c94ac88f-4671-3976-b60a-09064f1811e8", // 流动池中 base asset 的 id
+                "base_value": "354736.84", // 流动池中 base asset 的市值（美元）
+                "base_volume_24h": "54.50041403", // 流动池中 base asset 的 24h 交易量
+                "fee_24h": "141.66", // 24h 交易手续费收入（美元）
+                "fee_percent": "0.003", // 手续费率 0.3%
+                "liquidity": "4346.54975066", // 当前总流动性
+                "liquidity_asset_id": "b34633de-4012-38e3-88a9-1f41eafdf45a", // lp token 的 asset id
+                "max_liquidity": "100000000", // 流动性上限
+                "quote_amount": "47996.52233897", // // 流动池中 quote asset 的数量
+                "quote_asset_id": "f5ef6b5d-cc5a-3d90-b2c0-a2fd386e7a3c", // 流动池中 quote asset 的 id
+                "quote_value": "354399.91", // 流动池中 quote asset 的市值（美元）
+                "quote_volume_24h": "6385.11543606", // 流动池中 quote asset 的 24h 交易量
+                "route_id": 1, // 兑换时用到的路径 id
+                "transaction_count_24h": 381, // 24h 交易笔数
+                "version": 2365949, // 交易对版本号，单调递增
+                "volume_24h": "47242.1" // 24 小时交易量（美元）
+            }
+        ],
+        "fee_24h": "11895.29552486", // 24h 手续费总收入（美元）
+        "pair_count": 43,           // 交易对总个数
+        "transaction_count_24h": 28974, // 24 小时总交易数
+        "ts": 1616219578710, // 服务器时间戳 （ms）
+        "volume_24h": "4961737.7383114" // 24 小时总成交量（美元）
+    },
+    "ts": 1616219578711
 }
 ```
 
