@@ -14,7 +14,8 @@ type Pair struct {
 	FeePercent   decimal.Decimal `json:"fee_percent,omitempty"`
 	RouteID      int64           `json:"route_id,omitempty"`
 	// 池子总的流动性份额
-	Liquidity decimal.Decimal `json:"liquidity,omitempty"`
+	LiquidityAssetID string          `json:"liquidity_asset_id,omitempty"`
+	Liquidity        decimal.Decimal `json:"liquidity,omitempty"`
 	// 我的流动性份额，需要 WithToken
 	Share      decimal.Decimal `json:"share,omitempty"`
 	SwapMethod string          `json:"swap_method,omitempty"`
