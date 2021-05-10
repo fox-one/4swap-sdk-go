@@ -92,15 +92,15 @@ POST /api/actions
 
 ```json5
 {
-  "action": "{user_id},{follow_id},3,{asset_id},{route_id},{minimum_fill}"
+  "action": "3,{user_id},{follow_id},{asset_id},{route_id},{minimum_fill}"
 }
 ```
 
 ### body.action 介绍
 
-1. user_id 是收款用户的 mixin_id (uuid)
-2. follow_id 是查询订单用的自定义 id (uuid)
-3. asset_id 是要买的币的 asset id
+1. asset_id 是要买的币的 asset id
+2. user_id 是收款用户的 mixin_id (uuid)
+3. follow_id 是查询订单用的自定义 id (uuid)
 4. route_id 是自定义路径 id，为空的话引擎会自动选择最佳路径
 5. minimum_fill 是做少买入量，如果因为深度变化导致无法买入至少这个数量的币，则兑换失败退款
 
