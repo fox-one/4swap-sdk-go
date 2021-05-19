@@ -186,3 +186,63 @@ GET /api/orders/{follow_id}
   "t": "bf0c984d-7f8a-424e-bddd-473fcf5f7020", // follow id
 }
 ```
+
+## 注入流动性
+
+### 构造注入 memo
+
+可以直接使用 ```4swap-go-sdk``` [mtg.SwapAction](https://github.com/fox-one/4swap-sdk-go/blob/master/mtg/action.go#L37) 方法生成
+
+```http request
+POST /api/actions
+```
+
+**Body:**
+
+```json5
+{
+  "action": "1,{user_id},{follow_id},{asset_id},{slippage},{timeout}"
+}
+```
+
+### body.action 介绍
+
+1. user_id 是收款用户的 mixin_id (uuid)
+2. follow_id 是查询 deposit 用的自定义 id (uuid)。注意注入的两笔转账需要使用相同的 follow_id。
+3. asset_id 是要要注入的币相对的 asset id
+4. slippage 是注入滑点，比如 0.01 就是 1%
+5. timeout 注入超时时间，单位秒
+
+**Response:**
+
+```json5
+{
+  "follow_id": "follow id", // 和 body.action 一致
+  "action": "memo", // 下单转账需要的 memo
+}
+```
+
+### 查询 deposit 详情
+
+```http request
+GET /api/deposits/{follow_id}
+```
+
+**Response:**
+
+```json5
+{
+  "data": {
+    "id": "87ae5014-d20f-4cf1-b530-8771137e4e0e",
+    "created_at": "2020-09-15T03:35:34Z",
+    "user_id": "8017d200-7870-4b82-b53f-74bae1d2dad7",
+    "follow_id": "8017d200-7870-4b82-b53f-74bae1d2dad7",
+    "state": "Done", // 注入状态 Pending/Cancelled/Done
+    "base_asset_id": "base asset id",
+    "quote_asset_id": "quote asset id",
+    "base_amount": "1",
+    "quote_amount": "1",
+    "slippage": "0.01",
+  }
+}
+```
