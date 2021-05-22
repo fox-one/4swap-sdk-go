@@ -24,6 +24,12 @@ type Pair struct {
 	Volume24h      decimal.Decimal `json:"volume_24h,omitempty"`
 	BaseVolume24h  decimal.Decimal `json:"base_volume_24h,omitempty"`
 	QuoteVolume24h decimal.Decimal `json:"quote_volume_24h,omitempty"`
+	// value
+	BaseValue  decimal.Decimal `json:"base_value,omitempty"`
+	QuoteValue decimal.Decimal `json:"quote_value,omitempty"`
+	// stat
+	Fee24h              decimal.Decimal `json:"fee_24h,omitempty"`
+	TransactionCount24h decimal.Decimal `json:"transaction_count_24h,omitempty"`
 }
 
 func (pair *Pair) reverse() {
