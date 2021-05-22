@@ -29,7 +29,7 @@ type Pair struct {
 	QuoteValue decimal.Decimal `json:"quote_value,omitempty"`
 	// stat
 	Fee24h              decimal.Decimal `json:"fee_24h,omitempty"`
-	TransactionCount24h decimal.Decimal `json:"transaction_count_24h,omitempty"`
+	TransactionCount24h int64           `json:"transaction_count_24h,omitempty"`
 }
 
 func (pair *Pair) reverse() {
