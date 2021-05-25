@@ -8,7 +8,7 @@
 import (
 	fswap "github.com/fox-one/4swap-sdk-go"
 	mtg "github.com/fox-one/4swap-sdk-go/mtg"
-  "github.com/fox-one/mixin-sdk-go"
+	"github.com/fox-one/mixin-sdk-go"
 	"github.com/shopspring/decimal"
 )
 ```
@@ -22,19 +22,19 @@ When you perform essential operations, such as swapping crypto, adding liquidity
 The participants of each multisig are also the members of MTG. So please read them first and save them for later using.
 
 ```golang
-  ctx := context.TODO()
+ctx := context.TODO()
 
-  // use the 4swap's MTG api endpoint
-  fswap.UseEndpoint(fswap.MtgEndpoint)
+// use the 4swap's MTG api endpoint
+fswap.UseEndpoint(fswap.MtgEndpoint)
 
-  // read the mtg group
-  // the group information would change frequently
-  // it's recommended to save it for later using
-  group, err := fswap.ReadGroup(ctx)
-  if err != nil {
-    return err
-  }
-  ...
+// read the mtg group
+// the group information would change frequently
+// it's recommended to save it for later using
+group, err := fswap.ReadGroup(ctx)
+if err != nil {
+	return err
+}
+...
 ```
 
 ## Get all tradable pairs
@@ -42,11 +42,11 @@ The participants of each multisig are also the members of MTG. So please read th
 To get all supported by 4swap is easy:
 
 ```golang
-	pairs, err := fswap.ListPairs(ctx)
-	if err != nil {
-		return err
-	}
-  ...
+pairs, err := fswap.ListPairs(ctx)
+if err != nil {
+	return err
+}
+...
 ```
 
 ## Calculate the best route to trade
@@ -58,26 +58,26 @@ At present, you may let's 4swap to decide the route, but it has the performance 
 To calculate route is easy. Sort the pairs according to the liquidity and call `Route` or `ReverseRoute` methods, which will return an `order` object that includes the result of calculation.
 
 ```golang
-	// sort first
-	sort.Slice(pairs, func(i, j int) bool {
-		aLiquidity := pairs[i].BaseValue.Add(pairs[i].QuoteValue)
-		bLiquidity := pairs[j].BaseValue.Add(pairs[j].QuoteValue)
-		return aLiquidity.GreaterThan(bLiquidity)
-	})
+// sort first
+sort.Slice(pairs, func(i, j int) bool {
+	aLiquidity := pairs[i].BaseValue.Add(pairs[i].QuoteValue)
+	bLiquidity := pairs[j].BaseValue.Add(pairs[j].QuoteValue)
+	return aLiquidity.GreaterThan(bLiquidity)
+})
 
-  // calculate the route
-  // InputAssetID - the id of the asset you want to paid
-  // OutputAssetID - the id of the asset you trade for
-  // InputAmount - the amount to calucate the route, for example, 1000
-	preOrder, err := fswap.Route(pairs, InputAssetID, OutputAssetID, InputAmount)
-	if err != nil {
-		return err
-	}
+// calculate the route
+// InputAssetID - the id of the asset you want to paid
+// OutputAssetID - the id of the asset you trade for
+// InputAmount - the amount to calucate the route, for example, 1000
+preOrder, err := fswap.Route(pairs, InputAssetID, OutputAssetID, InputAmount)
+if err != nil {
+	return err
+}
 
-  // you can read the best route from Order.RouteAssets, which is an array of asset_id
-  log.Printf("Route: %v", preOrder.RouteAssets)
-	log.Printf("Price: %v", preOrder.FillAmount.Div(InputAmount))
-  ...
+// you can read the best route from Order.RouteAssets, which is an array of asset_id
+log.Printf("Route: %v", preOrder.RouteAssets)
+log.Printf("Price: %v", preOrder.FillAmount.Div(InputAmount))
+...
 ```
 
 ## Construct a real order
@@ -86,7 +86,7 @@ All required information about an order are store in the transaction memo, in JS
 
 ```json
 {
-  "action": "1,{receiver_id},{follow_id},{asset_id},{slippage},{timeout}"
+	"action": "1,{receiver_id},{follow_id},{asset_id},{slippage},{timeout}"
 }
 ```
 
@@ -101,27 +101,27 @@ in which,
 If you are using 4swap SDK, you can also use the method `mtg.SwapAction` to simplify the process:
 
 ```golang
-    // the ID to trace the orders at 4swap
-    followID, _ := uuid.NewV4()
+// the ID to trace the orders at 4swap
+followID, _ := uuid.NewV4()
 
-    // build a swap action, specified the parameters
-    action := mtg.SwapAction(
-        receiverID,
-        followID.String(),
-        OutputAssetID,
-        preOrder.Routes,
-        // the minimum amount of asset you will get.
-        // you may want to change this value to a number which less than preOrder.FillAmount
-        preOrder.FillAmount.Div(decimal.NewFromFloat(0.005)),
-    )
+// build a swap action, specified the parameters
+action := mtg.SwapAction(
+	receiverID,
+	followID.String(),
+	OutputAssetID,
+	preOrder.Routes,
+	// the minimum amount of asset you will get.
+	// you may want to change this value to a number which less than preOrder.FillAmount
+	preOrder.FillAmount.Div(decimal.NewFromFloat(0.005)),
+)
 
-    // generate the memo
-    memo, err := action.Encode(group.PublicKey)
-    if err != nil {
-        return err
-    }
-    log.Println("memo", memo)
-    ...
+// generate the memo
+memo, err := action.Encode(group.PublicKey)
+if err != nil {
+	return err
+}
+log.Println("memo", memo)
+...
 
 ```
 
@@ -134,21 +134,21 @@ This is a common scene for arbitrage bot. Please make sure the bot have enough c
 We need to use [mixin-sdk-go](https://github.com/fox-one/mixin-sdk-go) client to create and send the transaction to the kenerl nodes.
 
 ```golang
-    // send a transaction to a multi-sign address which specified by `OpponentMultisig`
-    // the OpponentMultisig.Receivers are the MTG group members of 4swap
-    tx, err := client.Transaction(ctx, &mixin.TransferInput{
-        AssetID: payAssetID,
-        Amount:  decimal.RequireFromString(amount),
-        TraceID: mixin.RandomTraceID(),
-        Memo:    memo,
-        OpponentMultisig: struct {
-            Receivers []string `json:"receivers,omitempty"`
-            Threshold uint8    `json:"threshold,omitempty"`
-        }{
-            Receivers: group.Members,
-            Threshold: uint8(group.Threshold),
-        },
-    }, *pin)
+// send a transaction to a multi-sign address which specified by `OpponentMultisig`
+// the OpponentMultisig.Receivers are the MTG group members of 4swap
+tx, err := client.Transaction(ctx, &mixin.TransferInput{
+	AssetID: payAssetID,
+	Amount:  decimal.RequireFromString(amount),
+	TraceID: mixin.RandomTraceID(),
+	Memo:    memo,
+	OpponentMultisig: struct {
+		Receivers []string `json:"receivers,omitempty"`
+		Threshold uint8    `json:"threshold,omitempty"`
+	}{
+		Receivers: group.Members,
+		Threshold: uint8(group.Threshold),
+	},
+}, *pin)
 ```
 
 ## Place an order via Mixin Messenger
@@ -160,29 +160,29 @@ This is a common scene for a webapp which provide swapping service to users, lik
 We need to post `https://api.mixin.one/payments` to get a payment object which contains `code_id` to create the scheme:
 
 ```typescript
-  function getPayments(asset_id, amount, memo, receivers, threshold): Promise<any> {
-    const params = {
-      asset_id,
-      amount,
-      memo,
-      trace_id: uuid(),
-      opponent_multisig: { receivers, threshold },
-    };
-    // use your http request lib here
-    return http.post("/payments", { data: params });
-  }
+function getPayments(asset_id, amount, memo, receivers, threshold): Promise<any> {
+	const params = {
+		asset_id,
+		amount,
+		memo,
+		trace_id: uuid(),
+		opponent_multisig: { receivers, threshold },
+	};
+	// use your http request lib here
+	return http.post("/payments", { data: params });
+}
 
-  ...
+...
 
-  const resp = await getPayments(
-    asset_id,  // the input asset id
-    value,     // the input amount
-    memo,      // create by `SwapAction`
-    members,   // read from the mulitsig group
-    threshold, // read from the mulitsig group
-  );
+const resp = await getPayments(
+	asset_id,  // the input asset id
+	value,     // the input amount
+	memo,      // create by `SwapAction`
+	members,   // read from the mulitsig group
+	threshold, // read from the mulitsig group
+);
 
-  window.location.href = `https://mixin.one/codes/${resp.code_id}`;
+window.location.href = `https://mixin.one/codes/${resp.coded}`;
 ```
 
 
