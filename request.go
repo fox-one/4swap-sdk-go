@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	Endpoint = "https://f1-uniswap-api.firesbox.com"
+	Endpoint = "https://swap-api.fox.one"
 	ClientID = "a753e0eb-3010-4c4a-a7b2-a7bda4063f62"
 
-	MtgEndpoint = "https://f1-mtgswap-api.firesbox.com"
+	MtgEndpoint = "https://mtgswap-api.fox.one"
 )
 
 var httpClient = resty.New().
