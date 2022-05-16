@@ -5,60 +5,71 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"errors"
+	"fmt"
 )
 
-// PKCS7Padding PKCS7补码, 可以参考下http://blog.studygolang.com/167.html
-func PKCS7Padding(data []byte, blockSize int) []byte {
-	padding := blockSize - len(data)%blockSize
-	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(data, padtext...)
+func PKCS7Padding(data []byte) []byte {
+	padding := aes.BlockSize - len(data)%aes.BlockSize
+	suffix := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(data, suffix...)
 }
 
-// UnPKCS7Padding 去除PKCS7的补码
 func UnPKCS7Padding(data []byte) []byte {
-	length := len(data)
-	// 去掉最后一个字节 unpadding 次
-	unpadding := int(data[length-1])
-	if length <= unpadding {
+	l := len(data)
+	if l == 0 {
 		return nil
 	}
-	return data[:(length - unpadding)]
+
+	n := int(data[l-1])
+	if n >= l {
+		return nil
+	}
+
+	return data[:(l - n)]
 }
 
 // Encrypt aes encrypt
 func Encrypt(data []byte, key, iv []byte) ([]byte, error) {
-	ckey, err := aes.NewCipher(key)
+	b, err := aes.NewCipher(key)
 	if nil != err {
 		return nil, err
 	}
 
-	encrypter := cipher.NewCBCEncrypter(ckey, iv)
+	cbc := cipher.NewCBCEncrypter(b, iv)
+	paddingData := PKCS7Padding(data)
+	dst := make([]byte, len(paddingData))
+	cbc.CryptBlocks(dst, paddingData)
 
-	// PKCS7补码
-	str := PKCS7Padding(data, 16)
-	out := make([]byte, len(str))
-
-	encrypter.CryptBlocks(out, str)
-	return out, nil
+	return dst, nil
 }
 
 // Decrypt aes decrypt
 func Decrypt(data []byte, key, iv []byte) ([]byte, error) {
-	ckey, err := aes.NewCipher(key)
+	b, err := aes.NewCipher(key)
 	if nil != err {
 		return nil, err
 	}
 
-	if len(data)%aes.BlockSize != 0 {
+	if len(data)%b.BlockSize() != 0 {
 		return nil, errors.New("ciphertext is not a multiple of the block size")
 	}
 
-	decrypter := cipher.NewCBCDecrypter(ckey, iv)
+	cbc := cipher.NewCBCDecrypter(b, iv)
+	dst := make([]byte, len(data))
+	cbc.CryptBlocks(dst, data)
+	body := UnPKCS7Padding(dst)
 
-	out := make([]byte, len(data))
-	decrypter.CryptBlocks(out, data)
+	// validate padding
+	n := len(dst) - len(body)
+	if ok := n >= 1 && n <= aes.BlockSize; !ok {
+		return nil, fmt.Errorf("padding %d out of range [1:%d]", n, aes.BlockSize)
+	}
 
-	// 去除PKCS7补码
-	out = UnPKCS7Padding(out)
-	return out, nil
+	for _, v := range dst[len(body):] {
+		if int(v) != n {
+			return nil, fmt.Errorf("invalid padding, expect %d but got %d", n, v)
+		}
+	}
+
+	return body, nil
 }
