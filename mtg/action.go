@@ -5,10 +5,11 @@ import (
 	"encoding/base64"
 	"time"
 
-	"github.com/fox-one/4swap-sdk-go/mtg/encoder"
 	"github.com/fox-one/mixin-sdk-go"
 	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
+
+	"github.com/fox-one/4swap-sdk-go/mtg/encoder"
 )
 
 type Action struct {
@@ -24,14 +25,14 @@ type Action struct {
 	AssetID string
 
 	// Deposit Timeout, optional, default is 10m
-	Timeout time.Duration
+	Timeout time.Duration `json:"Timeout,omitempty"`
 	// Deposit slippage, optional, default 0.01
-	Slippage decimal.Decimal
+	Slippage decimal.Decimal `json:"Slippage,omitempty"`
 
 	// swap routes
-	Routes string
+	Routes string `json:"Routes,omitempty"`
 	// Swap minimum fill amount
-	Minimum decimal.Decimal
+	Minimum decimal.Decimal `json:"Minimum,omitempty"`
 }
 
 func AddAction(userID, followID, assetID string, timeout time.Duration, slippage decimal.Decimal) Action {
