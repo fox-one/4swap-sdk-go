@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	Endpoint = "https://legacy-api.4swap.org"
+	LegacyEndpoint = "https://legacy-api.4swap.org"
 	ClientID = "a753e0eb-3010-4c4a-a7b2-a7bda4063f62"
 
 	MtgEndpoint = "https://api.4swap.org"
@@ -18,7 +18,7 @@ const (
 
 var httpClient = resty.New().
 	SetHeader("Content-Type", "application/json").
-	SetHostURL(Endpoint).
+	SetHostURL(MtgEndpoint).
 	SetTimeout(10 * time.Second).
 	SetPreRequestHook(func(c *resty.Client, req *http.Request) error {
 		if token, ok := TokenFrom(req.Context()); ok {
