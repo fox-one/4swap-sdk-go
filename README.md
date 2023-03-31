@@ -22,7 +22,6 @@ func TestMtgSwap(t *testing.T) {
     )
     
     ctx := context.Background()
-    fswap.UseEndpoint(fswap.MtgEndpoint)
     
     group, err := fswap.ReadGroup(ctx)
     if err != nil {
