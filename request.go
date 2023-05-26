@@ -11,14 +11,14 @@ import (
 
 const (
 	LegacyEndpoint = "https://legacy-api.4swap.org"
-	ClientID = "a753e0eb-3010-4c4a-a7b2-a7bda4063f62"
+	ClientID       = "a753e0eb-3010-4c4a-a7b2-a7bda4063f62"
 
 	MtgEndpoint = "https://api.4swap.org"
 )
 
 var httpClient = resty.New().
 	SetHeader("Content-Type", "application/json").
-	SetHostURL(MtgEndpoint).
+	SetBaseURL(MtgEndpoint).
 	SetTimeout(10 * time.Second).
 	SetPreRequestHook(func(c *resty.Client, req *http.Request) error {
 		if token, ok := TokenFrom(req.Context()); ok {
@@ -28,8 +28,16 @@ var httpClient = resty.New().
 		return nil
 	})
 
+func GetClient() *http.Client {
+	return httpClient.GetClient()
+}
+
+func GetRestyClient() *resty.Client {
+	return httpClient
+}
+
 func UseEndpoint(endpoint string) {
-	httpClient.SetHostURL(endpoint)
+	httpClient.SetBaseURL(endpoint)
 }
 
 func Request(ctx context.Context) *resty.Request {
