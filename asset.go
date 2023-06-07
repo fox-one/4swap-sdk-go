@@ -15,6 +15,15 @@ type (
 		Logo          string          `json:"logo,omitempty"`
 		ChainID       string          `json:"chain_id,omitempty"`
 		Price         decimal.Decimal `json:"price,omitempty"`
+		Chain         struct {
+			ID      string          `json:"id,omitempty"`
+			Name    string          `json:"name,omitempty"`
+			Symbol  string          `json:"symbol,omitempty"`
+			Logo    string          `json:"logo,omitempty"`
+			ChainID string          `json:"chain_id,omitempty"`
+			Price   decimal.Decimal `json:"price,omitempty"`
+			Tag     string          `json:"tag,omitempty"`
+		} `json:"chain,omitempty"`
 	}
 )
 
