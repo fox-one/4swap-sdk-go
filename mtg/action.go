@@ -2,10 +2,13 @@ package mtg
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"time"
 
 	"github.com/fox-one/4swap-sdk-go/mtg/encoder"
+	"github.com/fox-one/4swap-sdk-go/routes"
 	"github.com/fox-one/mixin-sdk-go"
 	"github.com/google/uuid"
 	"github.com/pandodao/mtg/mtgpack"
@@ -30,8 +33,10 @@ type Action struct {
 	// Deposit slippage, optional, default 0.01
 	Slippage decimal.Decimal `json:"Slippage,omitempty"`
 
-	// swap routes
+	// swap routes (swap v1)
 	Routes string `json:"Routes,omitempty"`
+	// swap routes group (swap v2)
+	Group routes.Group `json:"Group,omitempty"`
 	// Swap minimum fill amount
 	Minimum decimal.Decimal `json:"Minimum,omitempty"`
 }
@@ -54,6 +59,16 @@ func SwapAction(userID, followID, assetID string, routes string, min decimal.Dec
 		FollowID: followID,
 		AssetID:  assetID,
 		Routes:   routes,
+		Minimum:  min,
+	}
+}
+
+func SwapV2Action(userID, followID string, group routes.Group, min decimal.Decimal) Action {
+	return Action{
+		Type:     TransactionTypeSwapV2,
+		UserID:   userID,
+		FollowID: followID,
+		Group:    group,
 		Minimum:  min,
 	}
 }
@@ -108,6 +123,8 @@ func EncodeAction(action Action, publicKey ed25519.PublicKey) (string, error) {
 		}
 
 		values = append(values, asset, action.Routes, action.Minimum)
+	case TransactionTypeSwapV2:
+		return "", fmt.Errorf("use EncodeActionV2 instead")
 	}
 
 	return encodeMemo(publicKey, values...)
@@ -128,12 +145,12 @@ func encodeMemo(pub ed25519.PublicKey, values ...interface{}) (string, error) {
 	return base64.StdEncoding.EncodeToString(action), nil
 }
 
-// EncodeActionV1 encode action to 4swap memo v1
-func EncodeActionV1(action Action) (string, error) {
+// EncodeActionV2 encode action to 4swap memo v2
+func EncodeActionV2(action Action) (string, error) {
 	enc := mtgpack.NewEncoder()
 
 	h := protocol.Header{
-		Version:    1,
+		Version:    2,
 		ProtocolID: protocol.ProtocolFswap,
 		Action:     uint16(action.Type),
 	}
@@ -181,7 +198,24 @@ func EncodeActionV1(action Action) (string, error) {
 		if err := enc.EncodeValues(asset, action.Routes, action.Minimum); err != nil {
 			return "", err
 		}
+	case TransactionTypeSwapV2:
+		if err := enc.EncodeValues(action.Group, action.Minimum); err != nil {
+			return "", err
+		}
 	}
 
-	return base64.StdEncoding.EncodeToString(enc.Bytes()), nil
+	data := enc.Bytes()
+
+	// append sha256 checksum
+	sum := sha256.Sum256(data)
+	sum = sha256.Sum256(sum[:])
+	data = append(data, sum[:4]...)
+
+	return base64.StdEncoding.EncodeToString(data), nil
+}
+
+// EncodeActionV1 encode action to 4swap memo v1
+// deprecated, use EncodeActionV2 instead
+func EncodeActionV1(action Action) (string, error) {
+	return EncodeActionV2(action)
 }

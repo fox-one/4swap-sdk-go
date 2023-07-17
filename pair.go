@@ -12,6 +12,7 @@ type Pair struct {
 	QuoteAssetID string          `json:"quote_asset_id,omitempty"`
 	QuoteAmount  decimal.Decimal `json:"quote_amount,omitempty"`
 	FeePercent   decimal.Decimal `json:"fee_percent,omitempty"`
+	ProfitRate   decimal.Decimal `json:"profit_rate,omitempty"`
 	RouteID      int64           `json:"route_id,omitempty"`
 	// 池子总的流动性份额
 	LiquidityAssetID string          `json:"liquidity_asset_id,omitempty"`

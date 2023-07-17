@@ -1,4 +1,4 @@
-package fswap
+package legacy
 
 import (
 	"encoding/base64"

@@ -30,6 +30,8 @@ type Order struct {
 	Funds decimal.Decimal `json:"funds,omitempty"`
 	// deprecated, Use FillAmount instead
 	Amount decimal.Decimal `json:"amount,omitempty"`
+
+	RouteResults []*Result `json:"route_results,omitempty"`
 }
 
 type PreOrderReq struct {
@@ -39,7 +41,7 @@ type PreOrderReq struct {
 	PayAmount  decimal.Decimal `json:"pay_amount,omitempty"`
 	FillAmount decimal.Decimal `json:"fill_amount,omitempty"`
 	// deprecated
-	Funds  decimal.Decimal `json:"funds,omitempty"`
+	Funds decimal.Decimal `json:"funds,omitempty"`
 	// deprecated
 	Amount decimal.Decimal `json:"amount,omitempty"`
 	// deprecated

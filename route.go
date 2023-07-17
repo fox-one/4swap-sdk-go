@@ -3,29 +3,24 @@ package fswap
 import (
 	"math"
 
+	"github.com/fox-one/4swap-sdk-go/routes"
 	"github.com/shopspring/decimal"
-	"github.com/speps/go-hashids"
 )
 
 const (
 	MaxRouteDepth = 4
-	routeSalt     = "uniswap routes"
 )
 
+// EncodeRoutes encode route ids to string with hashids
+// deprecated use routes.Routes.HashString() instead
 func EncodeRoutes(ids []int64) string {
-	hd := hashids.NewData()
-	hd.Salt = routeSalt
-	h, _ := hashids.NewWithData(hd)
-	id, _ := h.EncodeInt64(ids)
-	return id
+	return routes.Routes(ids).HashString()
 }
 
+// DecodeRoutes decode route ids from string with hashids
+// deprecated use routes.ParseHashedRoutes() instead
 func DecodeRoutes(id string) []int64 {
-	hd := hashids.NewData()
-	hd.Salt = routeSalt
-	h, _ := hashids.NewWithData(hd)
-	ids, _ := h.DecodeInt64WithError(id)
-	return ids
+	return routes.ParseHashedRoutes(id)
 }
 
 type Graph map[string]map[string]*Pair
@@ -185,9 +180,11 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	order := &Order{}
+	order := &Order{
+		RouteResults: best.Results(false),
+	}
 	ids := make([]int64, 0, best.d)
-	for idx, r := range best.Results(false) {
+	for idx, r := range order.RouteResults {
 		if idx == 0 {
 			order.PayAssetID = r.PayAssetID
 			order.PayAmount = r.PayAmount
@@ -223,9 +220,12 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	order := &Order{}
+	order := &Order{
+		RouteResults: best.Results(true),
+	}
+
 	ids := make([]int64, 0, best.d)
-	for idx, r := range best.Results(true) {
+	for idx, r := range order.RouteResults {
 		if idx == 0 {
 			order.PayAssetID = r.PayAssetID
 			order.PayAmount = r.PayAmount
@@ -240,6 +240,73 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 
 	order.Routes = EncodeRoutes(ids)
 	return order, nil
+}
+
+// UpdatePairsWithRouteResults update base & quote amount for pairs after a route
+func UpdatePairsWithRouteResults(pairs []*Pair, results []*Result) {
+	m := make(map[int64]*Result)
+	for _, r := range results {
+		m[r.RouteID] = r
+	}
+
+	for _, p := range pairs {
+		r, ok := m[p.RouteID]
+		if !ok {
+			continue
+		}
+
+		profit := r.FeeAmount.Mul(p.ProfitRate).Truncate(8)
+		pay := r.PayAmount.Sub(profit)
+		fill := r.FillAmount
+
+		if p.BaseAssetID == r.PayAssetID {
+			p.BaseAmount = p.BaseAmount.Add(pay)
+		} else {
+			p.QuoteAmount = p.QuoteAmount.Add(pay)
+		}
+
+		if p.BaseAssetID == r.FillAssetID {
+			p.BaseAmount = p.BaseAmount.Sub(fill)
+		} else {
+			p.QuoteAmount = p.QuoteAmount.Sub(fill)
+		}
+	}
+}
+
+// GroupOrderRoutes generate a group routes from orders
+func GroupOrderRoutes(orders []*Order) routes.Group {
+	if len(orders) == 0 {
+		panic("empty orders")
+	}
+
+	var (
+		g    routes.Group
+		m    = map[string]int{}
+		pay  = orders[0].PayAssetID
+		fill = orders[0].FillAssetID
+	)
+
+	for _, order := range orders {
+		if order.PayAssetID != pay || order.FillAssetID != fill {
+			panic("pay or fill asset id not match")
+		}
+
+		if idx, ok := m[order.Routes]; ok {
+			path := g[idx]
+			path.Amount = path.Amount.Add(order.PayAmount)
+			g[idx] = path
+		} else {
+			path := routes.Path{
+				Amount: order.PayAmount,
+				Routes: routes.ParseHashedRoutes(order.Routes),
+			}
+
+			m[order.Routes] = len(g)
+			g = append(g, path)
+		}
+	}
+
+	return g
 }
 
 func cmpDepth(a, b int) int {
