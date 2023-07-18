@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/fox-one/mixin-sdk-go"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 // GenerateToken create a new mixin authorization token
@@ -22,7 +22,7 @@ func GenerateToken(clientID, sessionID, sessionKey string, exp time.Duration) (s
 	}
 
 	sig := mixin.SignRaw("GET", "/me", nil)
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewString()
 	token := auth.SignToken(sig, id, exp)
 	return token, nil
 }
