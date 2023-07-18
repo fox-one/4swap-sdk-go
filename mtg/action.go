@@ -207,10 +207,7 @@ func EncodeActionV2(action Action) (string, error) {
 	data := enc.Bytes()
 
 	// append sha256 checksum
-	sum := sha256.Sum256(data)
-	sum = sha256.Sum256(sum[:])
-	data = append(data, sum[:4]...)
-
+	data = append(data, checksum(data)...)
 	return base64.StdEncoding.EncodeToString(data), nil
 }
 
@@ -218,4 +215,10 @@ func EncodeActionV2(action Action) (string, error) {
 // deprecated, use EncodeActionV2 instead
 func EncodeActionV1(action Action) (string, error) {
 	return EncodeActionV2(action)
+}
+
+func checksum(data []byte) []byte {
+	sum := sha256.Sum256(data)
+	sum = sha256.Sum256(sum[:])
+	return sum[:4]
 }

@@ -255,7 +255,7 @@ func UpdatePairsWithRouteResults(pairs []*Pair, results []*Result) {
 			continue
 		}
 
-		profit := r.FeeAmount.Mul(p.ProfitRate).Truncate(8)
+		profit := r.PayAmount.Mul(p.ProfitRate).Truncate(8)
 		pay := r.PayAmount.Sub(profit)
 		fill := r.FillAmount
 

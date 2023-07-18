@@ -110,3 +110,95 @@ func TestDecodeRoutes(t *testing.T) {
 	assert.Equal(t, routes, decodeRoutes)
 	t.Log(routes, routeId, decodeRoutes)
 }
+
+func TestUpdatePairsWithRouteResults(t *testing.T) {
+	pairs := []*Pair{
+		{
+			RouteID:      1,
+			BaseAssetID:  "btc",
+			QuoteAssetID: "usdt",
+			BaseAmount:   Decimal("100"),
+			QuoteAmount:  Decimal("10000"),
+			FeePercent:   Decimal("0.003"),
+			ProfitRate:   Decimal("0.001"),
+		},
+		{
+			RouteID:      2,
+			BaseAssetID:  "btc",
+			QuoteAssetID: "xin",
+			BaseAmount:   Decimal("100"),
+			QuoteAmount:  Decimal("10000"),
+			FeePercent:   Decimal("0.003"),
+			ProfitRate:   Decimal("0.001"),
+		},
+	}
+
+	results := []*Result{
+		{
+			PayAssetID:  "usdt",
+			PayAmount:   Decimal("100"),
+			FillAssetID: "btc",
+			FillAmount:  Decimal("0.01"),
+			FeeAssetID:  "usdt",
+			FeeAmount:   Decimal("0.3"),
+			RouteID:     1,
+		},
+		{
+			PayAssetID:  "btc",
+			PayAmount:   Decimal("0.01"),
+			FillAssetID: "xin",
+			FillAmount:  Decimal("8.6"),
+			FeeAssetID:  "btc",
+			FeeAmount:   Decimal("0.00003"),
+			RouteID:     2,
+		},
+	}
+
+	UpdatePairsWithRouteResults(pairs, results)
+
+	{
+		p := pairs[0]
+		assert.Equal(t, Decimal("99.99").String(), p.BaseAmount.String())
+		assert.Equal(t, Decimal("10099.9").String(), p.QuoteAmount.String())
+	}
+
+	{
+		p := pairs[1]
+		assert.Equal(t, Decimal("100.00999").String(), p.BaseAmount.String())
+		assert.Equal(t, Decimal("9991.4").String(), p.QuoteAmount.String())
+	}
+}
+
+func TestGroupOrderRoutes(t *testing.T) {
+	orders := []*Order{
+		{
+			PayAssetID:  "usdt",
+			FillAssetID: "btc",
+			PayAmount:   Decimal("101"),
+			Routes:      EncodeRoutes([]int64{2, 5, 8, 1}),
+		},
+		{
+			PayAssetID:  "usdt",
+			FillAssetID: "btc",
+			PayAmount:   Decimal("102"),
+			Routes:      EncodeRoutes([]int64{1, 2, 3}),
+		},
+		{
+			PayAssetID:  "usdt",
+			FillAssetID: "btc",
+			PayAmount:   Decimal("103"),
+			Routes:      EncodeRoutes([]int64{1, 2}),
+		},
+		{
+			PayAssetID:  "usdt",
+			FillAssetID: "btc",
+			PayAmount:   Decimal("104"),
+			Routes:      EncodeRoutes([]int64{1, 2, 3}),
+		},
+	}
+
+	g := GroupOrderRoutes(orders)
+	assert.Len(t, g, 3)
+	assert.Equal(t, "101:2,5,8,1|206:1,2,3|103:1,2", g.String())
+	assert.Equal(t, "410", g.Sum().String())
+}
