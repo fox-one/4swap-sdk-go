@@ -8,9 +8,16 @@ import (
 )
 
 const (
-	MaxRouteDepth = 4
-	routeSalt     = "uniswap routes"
+	routeSalt = "uniswap routes"
 )
+
+var (
+	MaxRouteDepth = 4
+)
+
+func SetMaxRouteDepth(depth int) {
+	MaxRouteDepth = depth
+}
 
 func EncodeRoutes(ids []int64) string {
 	hd := hashids.NewData()
