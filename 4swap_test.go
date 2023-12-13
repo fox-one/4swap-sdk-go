@@ -7,7 +7,7 @@ import (
 
 	fswap "github.com/fox-one/4swap-sdk-go"
 	"github.com/fox-one/4swap-sdk-go/mtg"
-	"github.com/fox-one/mixin-sdk-go"
+	"github.com/fox-one/mixin-sdk-go/v2"
 	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
 )
@@ -121,7 +121,7 @@ func TestMtgSwap(t *testing.T) {
 
 	t.Log(memo)
 
-	// 使用 mixin-sdk-go 或者 bot-api-client-go 转给给 4swap 多签
+	// 使用 mixin-sdk-go/v2 或者 bot-api-client-go 转给给 4swap 多签
 
 	// 查询订单
 	ctx = fswap.WithToken(ctx, token)

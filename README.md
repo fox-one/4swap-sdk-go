@@ -49,7 +49,7 @@ func TestMtgSwap(t *testing.T) {
     
     t.Log(memo)
     
-    // use mixin-sdk-go or bot-api-client-go to transfer to 4swap's multisig address
+    // use mixin-sdk-go/v2 or bot-api-client-go to transfer to 4swap's multisig address
     
     // query the order.
     ctx = fswap.WithToken(ctx, token)

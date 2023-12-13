@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/fox-one/4swap-sdk-go/mtg/encoder"
-	"github.com/fox-one/mixin-sdk-go"
+	"github.com/fox-one/mixin-sdk-go/v2"
 	"github.com/google/uuid"
 	"github.com/pandodao/mtg/mtgpack"
 	"github.com/pandodao/mtg/protocol"

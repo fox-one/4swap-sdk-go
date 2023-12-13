@@ -119,7 +119,7 @@ POST /api/actions
 
 使用 mixin api ```POST /transactions``` 付款给 4swap mtg 多签，付款的币和数量就是下单的币和数量，memo 为上面创建的 memo
 
-> ```POST /transactions``` 的使用参考 [mixin-sdk-go](https://github.com/fox-one/mixin-sdk-go/blob/faab649ffba80acf12948d5bb2205e149d5ace7b/transaction_raw.go#L41) 
+> ```POST /transactions``` 的使用参考 [mixin-sdk-go/v2](https://github.com/fox-one/mixin-sdk-go/v2/blob/faab649ffba80acf12948d5bb2205e149d5ace7b/transaction_raw.go#L41) 
 
 
 ## 查询订单
