@@ -3,8 +3,8 @@ package swap
 import (
 	"log"
 
-	"github.com/fox-one/4swap-sdk-go/swap/curve"
-	"github.com/fox-one/4swap-sdk-go/swap/uni"
+	"github.com/fox-one/4swap-sdk-go/v2/swap/curve"
+	"github.com/fox-one/4swap-sdk-go/v2/swap/uni"
 	"github.com/shopspring/decimal"
 )
 

@@ -10,7 +10,7 @@
 ## 获取 4swap mtg 多签收款地址
 
 > 多签组信息不会频繁变动，建议保存在配置文件
-> [go sdk](https://github.com/fox-one/4swap-sdk-go/blob/master/group.go#L17)
+> [go sdk](https://github.com/fox-one/4swap-sdk-go/v2/blob/master/group.go#L17)
 
 ```http request
 GET /api/info
@@ -82,7 +82,7 @@ GET /api/pairs
 
 ## 构造下单 memo
 
-可以直接使用 ```4swap-go-sdk``` [mtg.SwapAction](https://github.com/fox-one/4swap-sdk-go/blob/master/mtg/action.go#L48) 方法生成
+可以直接使用 ```4swap-go-sdk``` [mtg.SwapAction](https://github.com/fox-one/4swap-sdk-go/v2/blob/master/mtg/action.go#L48) 方法生成
 
 ```http request
 POST /api/actions
@@ -125,7 +125,7 @@ POST /api/actions
 ## 查询订单
 
 > 需要在 Header 带上 Authorization:Bearer token，token 为订单收款人的 Mixin Authorization Token，生成方式参考
-> [4swap-go-sdk auth.go](https://github.com/fox-one/4swap-sdk-go/blob/master/auth.go#L12)
+> [4swap-go-sdk auth.go](https://github.com/fox-one/4swap-sdk-go/v2/blob/master/auth.go#L12)
 
 ```http request
 GET /api/orders/{follow_id}
@@ -191,7 +191,7 @@ GET /api/orders/{follow_id}
 
 ### 构造注入 memo
 
-可以直接使用 ```4swap-go-sdk``` [mtg.SwapAction](https://github.com/fox-one/4swap-sdk-go/blob/master/mtg/action.go#L37) 方法生成
+可以直接使用 ```4swap-go-sdk``` [mtg.SwapAction](https://github.com/fox-one/4swap-sdk-go/v2/blob/master/mtg/action.go#L37) 方法生成
 
 ```http request
 POST /api/actions

@@ -5,8 +5,8 @@ import (
 	"log"
 	"testing"
 
-	fswap "github.com/fox-one/4swap-sdk-go"
-	"github.com/fox-one/4swap-sdk-go/mtg"
+	fswap "github.com/fox-one/4swap-sdk-go/v2"
+	"github.com/fox-one/4swap-sdk-go/v2/mtg"
 	"github.com/fox-one/mixin-sdk-go/v2"
 	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"

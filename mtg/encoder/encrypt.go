@@ -9,7 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/fox-one/4swap-sdk-go/mtg/aes"
+	"github.com/fox-one/4swap-sdk-go/v2/mtg/aes"
 	"golang.org/x/crypto/curve25519"
 )
 

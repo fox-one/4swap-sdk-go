@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fox-one/4swap-sdk-go/swap"
+	"github.com/fox-one/4swap-sdk-go/v2/swap"
 	"github.com/shopspring/decimal"
 )
 
