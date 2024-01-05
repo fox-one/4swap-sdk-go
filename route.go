@@ -3,30 +3,13 @@ package fswap
 import (
 	"math"
 
+	"github.com/fox-one/4swap-sdk-go/v2/route"
 	"github.com/shopspring/decimal"
-	"github.com/speps/go-hashids"
 )
 
 const (
 	MaxRouteDepth = 4
-	routeSalt     = "uniswap routes"
 )
-
-func EncodeRoutes(ids []int64) string {
-	hd := hashids.NewData()
-	hd.Salt = routeSalt
-	h, _ := hashids.NewWithData(hd)
-	id, _ := h.EncodeInt64(ids)
-	return id
-}
-
-func DecodeRoutes(id string) []int64 {
-	hd := hashids.NewData()
-	hd.Salt = routeSalt
-	h, _ := hashids.NewWithData(hd)
-	ids, _ := h.DecodeInt64WithError(id)
-	return ids
-}
 
 type Graph map[string]map[string]*Pair
 
@@ -68,7 +51,7 @@ func (n *node) ReverseCmp(a *node) int {
 	return cmpDepth(n.d, a.d)
 }
 
-func (n *node) Contain(id int64) bool {
+func (n *node) Contain(id uint16) bool {
 	for iter := n; iter != nil && iter.d > 0; iter = iter.p {
 		if iter.RouteID == id {
 			return true
@@ -185,22 +168,22 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	order := &Order{}
-	ids := make([]int64, 0, best.d)
-	for idx, r := range best.Results(false) {
-		if idx == 0 {
-			order.PayAssetID = r.PayAssetID
-			order.PayAmount = r.PayAmount
-			order.RouteAssets = append(order.RouteAssets, order.PayAssetID)
-		}
-
-		order.FillAssetID = r.FillAssetID
-		order.FillAmount = r.FillAmount
-		order.RouteAssets = append(order.RouteAssets, order.FillAssetID)
-		ids = append(ids, r.RouteID)
+	order := &Order{
+		PayAssetID:  payAssetID,
+		PayAmount:   payAmount,
+		FillAssetID: fillAssetID,
+		FillAmount:  best.FillAmount,
 	}
 
-	order.Routes = EncodeRoutes(ids)
+	var path = route.Path{Weight: 100}
+	for _, r := range best.Results(false) {
+		path.Pairs = append(path.Pairs, r.RouteID)
+
+		p := g[r.PayAssetID][r.FillAssetID]
+		updatePairWithResult(p, r)
+	}
+
+	order.Paths = append(order.Paths, path)
 	return order, nil
 }
 
@@ -223,23 +206,45 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	order := &Order{}
-	ids := make([]int64, 0, best.d)
-	for idx, r := range best.Results(true) {
-		if idx == 0 {
-			order.PayAssetID = r.PayAssetID
-			order.PayAmount = r.PayAmount
-			order.RouteAssets = append(order.RouteAssets, order.PayAssetID)
-		}
-
-		order.FillAssetID = r.FillAssetID
-		order.FillAmount = r.FillAmount
-		order.RouteAssets = append(order.RouteAssets, order.FillAssetID)
-		ids = append(ids, r.RouteID)
+	order := &Order{
+		PayAssetID:  payAssetID,
+		PayAmount:   best.PayAmount,
+		FillAssetID: fillAssetID,
+		FillAmount:  fillAmount,
 	}
 
-	order.Routes = EncodeRoutes(ids)
+	var path = route.Path{Weight: 100}
+	for _, r := range best.Results(true) {
+		path.Pairs = append(path.Pairs, r.RouteID)
+
+		p := g[r.PayAssetID][r.FillAssetID]
+		updatePairWithResult(p, r)
+	}
+
+	order.Paths = append(order.Paths, path)
 	return order, nil
+}
+
+func MergeOrders(orders []*Order) *Order {
+	var m Order
+
+	for _, order := range orders {
+		m.PayAssetID = order.PayAssetID
+		m.PayAmount = m.PayAmount.Add(order.PayAmount)
+		m.FillAssetID = order.FillAssetID
+		m.FillAmount = m.FillAmount.Add(order.FillAmount)
+	}
+
+	for _, order := range orders {
+		w := order.PayAmount.Div(m.PayAmount).Shift(2)
+
+		for _, path := range order.Paths {
+			path.Weight = uint8(path.Share().Mul(w).IntPart())
+			m.Paths = mergePaths(m.Paths, path)
+		}
+	}
+
+	return &m
 }
 
 func cmpDepth(a, b int) int {
@@ -250,4 +255,40 @@ func cmpDepth(a, b int) int {
 	} else {
 		return 0
 	}
+}
+
+func updatePairWithResult(p *Pair, r *Result) {
+	if r.PayAssetID == p.BaseAssetID {
+		p.BaseAmount = p.BaseAmount.Add(r.PayAmount).Sub(r.ProfitAmount)
+		p.QuoteAmount = p.QuoteAmount.Sub(r.FillAmount)
+	} else {
+		p.QuoteAmount = p.QuoteAmount.Add(r.PayAmount).Sub(r.ProfitAmount)
+		p.BaseAmount = p.BaseAmount.Sub(r.FillAmount)
+	}
+}
+
+func equalPairs(a, b []uint16) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for idx, id := range a {
+		if id != b[idx] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func mergePaths(paths route.Paths, p route.Path) route.Paths {
+	for idx, path := range paths {
+		if equalPairs(path.Pairs, p.Pairs) {
+			path.Weight += p.Weight
+			paths[idx] = path
+			return paths
+		}
+	}
+
+	return append(paths, p)
 }

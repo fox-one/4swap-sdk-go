@@ -12,14 +12,13 @@ type Pair struct {
 	QuoteAssetID string          `json:"quote_asset_id,omitempty"`
 	QuoteAmount  decimal.Decimal `json:"quote_amount,omitempty"`
 	FeePercent   decimal.Decimal `json:"fee_percent,omitempty"`
-	RouteID      int64           `json:"route_id,omitempty"`
+	ProfitRate   decimal.Decimal `json:"profit_rate,omitempty"`
+	RouteID      uint16          `json:"route_id,omitempty"`
 	// 池子总的流动性份额
 	LiquidityAssetID string          `json:"liquidity_asset_id,omitempty"`
 	Liquidity        decimal.Decimal `json:"liquidity,omitempty"`
-	// 我的流动性份额，需要 WithToken
-	Share      decimal.Decimal `json:"share,omitempty"`
-	SwapMethod string          `json:"swap_method,omitempty"`
-	Version    int64           `json:"version,omitempty"`
+	SwapMethod       string          `json:"swap_method,omitempty"`
+	Version          int64           `json:"version,omitempty"`
 	// volume
 	Volume24h      decimal.Decimal `json:"volume_24h,omitempty"`
 	BaseVolume24h  decimal.Decimal `json:"base_volume_24h,omitempty"`
@@ -39,9 +38,9 @@ func (pair *Pair) reverse() {
 }
 
 // ReadPair return pair detail by base asset id & quote asset id
-func ReadPair(ctx context.Context, base, quote string) (*Pair, error) {
+func (c *Client) ReadPair(ctx context.Context, base, quote string) (*Pair, error) {
 	const uri = "/api/pairs/{base_asset_id}/{quote_asset_id}"
-	resp, err := Request(ctx).SetPathParams(map[string]string{
+	resp, err := c.request(ctx).SetPathParams(map[string]string{
 		"base_asset_id":  base,
 		"quote_asset_id": quote,
 	}).Get(uri)
@@ -61,10 +60,10 @@ func ReadPair(ctx context.Context, base, quote string) (*Pair, error) {
 	return &pair, err
 }
 
-// ReadPairs list all pairs
-func ListPairs(ctx context.Context) ([]*Pair, error) {
+// ListPairs list all pairs
+func (c *Client) ListPairs(ctx context.Context) ([]*Pair, error) {
 	const uri = "/api/pairs"
-	resp, err := Request(ctx).Get(uri)
+	resp, err := c.request(ctx).Get(uri)
 	if err != nil {
 		return nil, err
 	}

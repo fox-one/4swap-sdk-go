@@ -2,7 +2,6 @@ package fswap
 
 import (
 	"context"
-	"encoding/base64"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,8 +10,9 @@ import (
 
 func TestReadGroup(t *testing.T) {
 	ctx := context.Background()
-	group, err := ReadGroup(ctx)
+	c := New()
+
+	group, err := c.ReadGroup(ctx)
 	require.Nil(t, err, "read group")
 	assert.NotEmpty(t, group.Members, "receivers should not be empty")
-	t.Log(base64.StdEncoding.EncodeToString(group.PublicKey))
 }

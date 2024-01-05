@@ -15,22 +15,15 @@ type (
 		Logo          string          `json:"logo,omitempty"`
 		ChainID       string          `json:"chain_id,omitempty"`
 		Price         decimal.Decimal `json:"price,omitempty"`
-		Chain         struct {
-			ID      string          `json:"id,omitempty"`
-			Name    string          `json:"name,omitempty"`
-			Symbol  string          `json:"symbol,omitempty"`
-			Logo    string          `json:"logo,omitempty"`
-			ChainID string          `json:"chain_id,omitempty"`
-			Price   decimal.Decimal `json:"price,omitempty"`
-			Tag     string          `json:"tag,omitempty"`
-		} `json:"chain,omitempty"`
+		Tag           string          `json:"tag,omitempty"`
+		Chain         *Asset          `json:"chain,omitempty"`
 	}
 )
 
 // ReadAsset read asset
-func ReadAsset(ctx context.Context, assetID string) (*Asset, error) {
+func (c *Client) ReadAsset(ctx context.Context, assetID string) (*Asset, error) {
 	const uri = "/api/assets/{id}"
-	resp, err := Request(ctx).SetPathParams(map[string]string{
+	resp, err := c.request(ctx).SetPathParams(map[string]string{
 		"id": assetID,
 	}).Get(uri)
 	if err != nil {
@@ -46,9 +39,9 @@ func ReadAsset(ctx context.Context, assetID string) (*Asset, error) {
 }
 
 // ListAssets list all assets
-func ListAssets(ctx context.Context) ([]*Asset, error) {
+func (c *Client) ListAssets(ctx context.Context) ([]*Asset, error) {
 	const uri = "/api/assets"
-	resp, err := Request(ctx).Get(uri)
+	resp, err := c.request(ctx).Get(uri)
 	if err != nil {
 		return nil, err
 	}
