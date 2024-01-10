@@ -11,11 +11,14 @@ import (
 func TestReadPair(t *testing.T) {
 	const (
 		baseAssetID  = "4d8c508b-91c5-375b-92b0-ee702ed2dac5"
-		quoteAssetID = "815b0b1a-2764-3736-8faa-42d694fa620a"
+		quoteAssetID = "31d2ea9c-95eb-3355-b65b-ba096853bc18"
 	)
 
 	ctx := context.Background()
-	pair, err := ReadPair(ctx, baseAssetID, quoteAssetID)
+	c := New()
+	c.Resty().Debug = true
+
+	pair, err := c.ReadPair(ctx, baseAssetID, quoteAssetID)
 	require.Nil(t, err, "request should be ok")
 
 	t.Log(pair.BaseAssetID, pair.BaseAmount)
@@ -25,7 +28,9 @@ func TestReadPair(t *testing.T) {
 
 func TestListPairs(t *testing.T) {
 	ctx := context.Background()
-	pairs, err := ListPairs(ctx)
+	c := New()
+
+	pairs, err := c.ListPairs(ctx)
 	require.Nil(t, err, "request should be ok")
 	assert.NotEmpty(t, pairs, "pairs should not be empty")
 }

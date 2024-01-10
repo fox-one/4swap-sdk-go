@@ -2,21 +2,18 @@ package fswap
 
 import (
 	"context"
-	"crypto/ed25519"
 )
 
-type (
-	Group struct {
-		Members   []string          `json:"members,omitempty"`
-		Threshold uint              `json:"threshold,omitempty"`
-		PublicKey ed25519.PublicKey `json:"public_key"`
-	}
-)
+type Group struct {
+	Members    []string `json:"members,omitempty"`
+	Threshold  uint8    `json:"threshold,omitempty"`
+	MixAddress string   `json:"mix_address,omitempty"`
+}
 
 // ReadGroup return mtg Group info ( MTG only)
-func ReadGroup(ctx context.Context) (*Group, error) {
+func (c *Client) ReadGroup(ctx context.Context) (*Group, error) {
 	const uri = "/api/info"
-	resp, err := Request(ctx).Get(uri)
+	resp, err := c.request(ctx).Get(uri)
 	if err != nil {
 		return nil, err
 	}

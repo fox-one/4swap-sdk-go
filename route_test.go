@@ -1,112 +1,136 @@
 package fswap
 
 import (
-	"context"
 	"testing"
 
+	"github.com/fox-one/4swap-sdk-go/v2/route"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRoute(t *testing.T) {
-	ctx := context.Background()
-	payAssetID := "c94ac88f-4671-3976-b60a-09064f1811e8"
-	fillAssetID := "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
-
-	UseEndpoint(MtgEndpoint)
-	pairs, err := ListPairs(ctx)
-	if err != nil {
-		t.Error("ListPairs", err)
-		return
+func Test_mergePaths(t *testing.T) {
+	type args struct {
+		paths route.Paths
+		p     route.Path
+	}
+	tests := []struct {
+		name string
+		args args
+		want route.Paths
+	}{
+		{
+			name: "merge into empty paths",
+			args: args{
+				paths: route.Paths{},
+				p:     route.Path{Weight: 100, Pairs: []uint16{1, 2, 3}},
+			},
+			want: route.Paths{
+				{Weight: 100, Pairs: []uint16{1, 2, 3}},
+			},
+		},
+		{
+			name: "merge into same pairs paths",
+			args: args{
+				paths: route.Paths{
+					{Weight: 80, Pairs: []uint16{1, 2, 3}},
+				},
+				p: route.Path{Weight: 20, Pairs: []uint16{1, 2, 3}},
+			},
+			want: route.Paths{
+				{Weight: 100, Pairs: []uint16{1, 2, 3}},
+			},
+		},
+		{
+			name: "merge into different pairs paths",
+			args: args{
+				paths: route.Paths{
+					{Weight: 80, Pairs: []uint16{1, 2, 3}},
+				},
+				p: route.Path{Weight: 20, Pairs: []uint16{1, 2, 4}},
+			},
+			want: route.Paths{
+				{Weight: 80, Pairs: []uint16{1, 2, 3}},
+				{Weight: 20, Pairs: []uint16{1, 2, 4}},
+			},
+		},
 	}
 
-	t.Run("0.01 xin", func(t *testing.T) {
-		order, err := Route(pairs, payAssetID, fillAssetID, Decimal("0.01"))
-		if err != nil {
-			t.Error("Route", err)
-			return
-		}
-
-		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
-	})
-
-	t.Run("0.1 xin", func(t *testing.T) {
-		order, err := Route(pairs, payAssetID, fillAssetID, Decimal("0.1"))
-		if err != nil {
-			t.Error("Route", err)
-			return
-		}
-
-		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
-	})
-
-	t.Run("1 xin", func(t *testing.T) {
-		order, err := Route(pairs, payAssetID, fillAssetID, Decimal("1"))
-		if err != nil {
-			t.Error("Route", err)
-			return
-		}
-
-		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, mergePaths(tt.args.paths, tt.args.p), "mergePaths(%v, %v)", tt.args.paths, tt.args.p)
+		})
+	}
 }
 
-func TestReverseRoute(t *testing.T) {
-	ctx := context.Background()
-	payAssetID := "c94ac88f-4671-3976-b60a-09064f1811e8"
-	fillAssetID := "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
+func Test_equalPairs(t *testing.T) {
+	type args struct {
+		a []uint16
+		b []uint16
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "equal",
+			args: args{
+				a: []uint16{1, 2, 3},
+				b: []uint16{1, 2, 3},
+			},
+			want: true,
+		},
+		{
+			name: "not equal",
+			args: args{
+				a: []uint16{1, 2, 3},
+				b: []uint16{1, 2, 4},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, equalPairs(tt.args.a, tt.args.b), "equalPairs(%v, %v)", tt.args.a, tt.args.b)
+		})
+	}
+}
 
-	UseEndpoint(MtgEndpoint)
-	pairs, err := ListPairs(ctx)
-	if err != nil {
-		t.Error("ListPairs", err)
-		return
+func TestMergeOrders(t *testing.T) {
+	orders := []*Order{
+		{
+			PayAssetID:  "pUSD",
+			PayAmount:   decimal.NewFromFloat(100),
+			FillAssetID: "USDT",
+			FillAmount:  decimal.NewFromFloat(100.1),
+			Paths: route.Paths{
+				{Weight: 100, Pairs: []uint16{1, 2, 3}},
+			},
+		},
+		{
+			PayAssetID:  "pUSD",
+			PayAmount:   decimal.NewFromFloat(64),
+			FillAssetID: "USDT",
+			FillAmount:  decimal.NewFromFloat(63.9),
+			Paths: route.Paths{
+				{Weight: 100, Pairs: []uint16{1, 2, 3}},
+			},
+		},
+		{
+			PayAssetID:  "pUSD",
+			PayAmount:   decimal.NewFromFloat(36),
+			FillAssetID: "USDT",
+			FillAmount:  decimal.NewFromFloat(36.2),
+			Paths: route.Paths{
+				{Weight: 100, Pairs: []uint16{1, 4, 3}},
+			},
+		},
 	}
 
-	t.Run("0.00001 btc", func(t *testing.T) {
-		order, err := ReverseRoute(pairs, payAssetID, fillAssetID, Decimal("0.00001"))
-		if err != nil {
-			t.Error("Route", err)
-			return
-		}
-
-		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
-	})
-
-	t.Run("0.01 btc", func(t *testing.T) {
-		order, err := ReverseRoute(pairs, payAssetID, fillAssetID, Decimal("0.01"))
-		if err != nil {
-			t.Error("Route", err)
-			return
-		}
-
-		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
-	})
-
-	t.Run("0.1 btc", func(t *testing.T) {
-		order, err := ReverseRoute(pairs, payAssetID, fillAssetID, Decimal("0.1"))
-		if err != nil {
-			t.Error("Route", err)
-			return
-		}
-
-		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
-	})
-
-	t.Run("1 btc", func(t *testing.T) {
-		order, err := ReverseRoute(pairs, payAssetID, fillAssetID, Decimal("1"))
-		if err != nil {
-			t.Error("Route", err)
-			return
-		}
-
-		t.Log(order.PayAmount, order.FillAmount, order.RouteAssets, order.Routes)
-	})
-}
-
-func TestDecodeRoutes(t *testing.T) {
-	routes := []int64{173, 171, 1, 2, 10}
-	routeId := EncodeRoutes(routes)
-	decodeRoutes := DecodeRoutes(routeId)
-	assert.Equal(t, routes, decodeRoutes)
-	t.Log(routes, routeId, decodeRoutes)
+	m := MergeOrders(orders)
+	assert.Equal(t, "pUSD", m.PayAssetID)
+	assert.Equal(t, decimal.NewFromFloat(100+64+36).String(), m.PayAmount.String())
+	assert.Equal(t, "USDT", m.FillAssetID)
+	assert.Equal(t, decimal.NewFromFloat(100.1+63.9+36.2).String(), m.FillAmount.String())
+	assert.Equal(t, "82:1,2,3;18:1,4,3", m.Paths.String())
 }
