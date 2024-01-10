@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/fox-one/mixin-sdk-go/v2"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -21,9 +22,9 @@ func TestPreOrder(t *testing.T) {
 	}
 
 	req := &PreOrderReq{
-		PayAssetID:  "31d2ea9c-95eb-3355-b65b-ba096853bc18",
-		FillAssetID: "4d8c508b-91c5-375b-92b0-ee702ed2dac5",
-		PayAmount:   decimal.NewFromInt(100),
+		PayAssetID:  "4d8c508b-91c5-375b-92b0-ee702ed2dac5",
+		FillAssetID: "31d2ea9c-95eb-3355-b65b-ba096853bc18",
+		PayAmount:   decimal.NewFromFloat(0.1),
 	}
 
 	preOrder, err := PreOrderWithPairs(pairs, req)
@@ -45,6 +46,16 @@ func TestPreOrder(t *testing.T) {
 	}
 
 	t.Logf("target mix address: %s", group.MixAddress)
+
+	transfer := &mixin.TransferInput{
+		AssetID:    req.PayAssetID,
+		OpponentID: group.MixAddress,
+		Amount:     req.PayAmount,
+		TraceID:    followID,
+		Memo:       memo,
+	}
+
+	t.Log(mixin.URL.SafePay(transfer))
 
 	// transfer pay asset to mix address
 

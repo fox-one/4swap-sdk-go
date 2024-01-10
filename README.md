@@ -20,9 +20,9 @@ go get github.com/fox-one/4swap-sdk-go/v2
 ### Example
 
 ```golang
-func TestMtgSwap(t *testing.T) {
+func TestPreOrder(t *testing.T) {
     ctx := context.Background()
-    
+
     c := New()
     c.UseToken("your auth token")
     
@@ -32,9 +32,9 @@ func TestMtgSwap(t *testing.T) {
     }
     
     req := &PreOrderReq{
-        PayAssetID:  "31d2ea9c-95eb-3355-b65b-ba096853bc18",
-        FillAssetID: "4d8c508b-91c5-375b-92b0-ee702ed2dac5",
-        PayAmount:   decimal.NewFromInt(100),
+        PayAssetID:  "4d8c508b-91c5-375b-92b0-ee702ed2dac5",
+        FillAssetID: "31d2ea9c-95eb-3355-b65b-ba096853bc18",
+        PayAmount:   decimal.NewFromFloat(0.1),
     }
     
     preOrder, err := PreOrderWithPairs(pairs, req)
@@ -52,10 +52,20 @@ func TestMtgSwap(t *testing.T) {
     
     group, err := c.ReadGroup(ctx)
     if err != nil {
-		t.Fatal(err)
+        t.Fatal(err)
     }
     
     t.Logf("target mix address: %s", group.MixAddress)
+    
+    transfer := &mixin.TransferInput{
+        AssetID:    req.PayAssetID,
+        OpponentID: group.MixAddress,
+        Amount:     req.PayAmount,
+        TraceID:    followID,
+        Memo:       memo,
+    }
+    
+    t.Log(mixin.URL.SafePay(transfer))
     
     // transfer pay asset to mix address
     
