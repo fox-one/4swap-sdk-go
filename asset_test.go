@@ -21,6 +21,7 @@ func TestReadAsset(t *testing.T) {
 	require.Nil(t, err, "request should be ok")
 	require.True(t, asset.Price.GreaterThan(decimal.Zero), "price should be greater than zero")
 	require.True(t, len(asset.Chain.Symbol) > 0, "require chain symbol exists")
+	require.True(t, asset.Chain != nil && asset.Chain.ID == asset.ChainID)
 
 	t.Log(asset.Symbol, asset.Price)
 }

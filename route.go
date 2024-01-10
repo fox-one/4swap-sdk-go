@@ -168,22 +168,22 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	order := &Order{
-		PayAssetID:  payAssetID,
-		PayAmount:   payAmount,
-		FillAssetID: fillAssetID,
-		FillAmount:  best.FillAmount,
-	}
-
-	var path = route.Path{Weight: 100}
+	var ids []uint16
 	for _, r := range best.Results(false) {
-		path.Pairs = append(path.Pairs, r.RouteID)
+		ids = append(ids, r.RouteID)
 
 		p := g[r.PayAssetID][r.FillAssetID]
 		updatePairWithResult(p, r)
 	}
 
-	order.Paths = append(order.Paths, path)
+	order := &Order{
+		PayAssetID:  payAssetID,
+		PayAmount:   payAmount,
+		FillAssetID: fillAssetID,
+		FillAmount:  best.FillAmount,
+		Paths:       route.Single(ids...),
+	}
+
 	return order, nil
 }
 
@@ -206,22 +206,22 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	order := &Order{
-		PayAssetID:  payAssetID,
-		PayAmount:   best.PayAmount,
-		FillAssetID: fillAssetID,
-		FillAmount:  fillAmount,
-	}
-
-	var path = route.Path{Weight: 100}
+	var ids []uint16
 	for _, r := range best.Results(true) {
-		path.Pairs = append(path.Pairs, r.RouteID)
+		ids = append(ids, r.RouteID)
 
 		p := g[r.PayAssetID][r.FillAssetID]
 		updatePairWithResult(p, r)
 	}
 
-	order.Paths = append(order.Paths, path)
+	order := &Order{
+		PayAssetID:  payAssetID,
+		PayAmount:   best.PayAmount,
+		FillAssetID: fillAssetID,
+		FillAmount:  fillAmount,
+		Paths:       route.Single(ids...),
+	}
+
 	return order, nil
 }
 

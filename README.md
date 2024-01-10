@@ -4,6 +4,12 @@
 
 [4swap](https://4swap.org) is a decentralized protocol implement for automated liquidity provision on [Mixin Network](https://mixin.one)
 
+## Install
+
+```bash
+go get github.com/fox-one/4swap-sdk-go/v2
+```
+
 ### Authorization
 
 4swap supports two kinds of access tokens:
@@ -15,49 +21,50 @@
 
 ```golang
 func TestMtgSwap(t *testing.T) {
-    const (
-        btc   = "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
-        xin   = "c94ac88f-4671-3976-b60a-09064f1811e8"
-        token = "your authorization token"
-    )
-    
     ctx := context.Background()
     
-    group, err := fswap.ReadGroup(ctx)
+    c := New()
+    c.UseToken("your auth token")
+    
+    pairs, err := c.ListPairs(ctx)
     if err != nil {
         t.Fatal(err)
     }
     
-    me, err := mixin.UserMe(ctx, token)
+    req := &PreOrderReq{
+        PayAssetID:  "31d2ea9c-95eb-3355-b65b-ba096853bc18",
+        FillAssetID: "4d8c508b-91c5-375b-92b0-ee702ed2dac5",
+        PayAmount:   decimal.NewFromInt(100),
+    }
+    
+    preOrder, err := PreOrderWithPairs(pairs, req)
     if err != nil {
         t.Fatal(err)
     }
     
-    followID, _ := uuid.NewV4()
-    action := mtg.SwapAction(
-        me.UserID,
-        followID.String(),
-        btc,
-        "", // leave the routes field as empty to let the engine decide the route. 
-        decimal.NewFromFloat(0.1),
-    )
+    t.Logf("fill amount: %s", preOrder.FillAmount)
     
-    memo, err := action.Encode(group.PublicKey)
+    followID := uuid.NewString()
+    minAmount := preOrder.FillAmount.Mul(decimal.NewFromFloat(0.99)).Truncate(8)
+    memo := BuildSwap(followID, req.FillAssetID, preOrder.Paths, minAmount)
+    
+    t.Logf("memo: %s", memo)
+    
+    group, err := c.ReadGroup(ctx)
     if err != nil {
-        t.Fatal(err)
+		t.Fatal(err)
     }
     
-    t.Log(memo)
+    t.Logf("target mix address: %s", group.MixAddress)
     
-    // use mixin-sdk-go/v2 or bot-api-client-go to transfer to 4swap's multisig address
+    // transfer pay asset to mix address
     
-    // query the order.
-    ctx = fswap.WithToken(ctx, token)
-    order, err := fswap.ReadOrder(ctx, followID.String())
+    // view order detail
+    order, err := c.ReadOrder(ctx, followID)
     if err != nil {
-        t.Fatal(err)
+        assert.True(t, IsErrorCode(err, 401))
+    } else {
+        t.Logf("order state: %s", order.State)
     }
-    
-    t.Log(order.State)
 }
 ```
