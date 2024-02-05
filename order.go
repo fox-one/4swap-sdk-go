@@ -38,8 +38,9 @@ type PreOrderReq struct {
 // PreOrder 预下单
 //
 // 如果要同时对多个交易对预下单，不建议使用这个方法；而是先调用 ListPairs
-// 然后重复使用 Pairs 去 Route 或者 ReverseRoute，这样只需要调用一次 /pairs 接口
+// 然后重复拷贝 Pairs 去 Route 或者 ReverseRoute，这样只需要调用一次 /pairs 接口
 // 不会那么容易触发 Rate Limit
+// **注意:** ListPairs 获取到的 Pairs 需要重复拷贝, Route 和 ReverseRoute 会修改Pairs数据
 func (c *Client) PreOrder(ctx context.Context, req *PreOrderReq) (*Order, error) {
 	pairs, err := c.ListPairs(ctx)
 	if err != nil {
