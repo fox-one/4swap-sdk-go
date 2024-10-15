@@ -25,7 +25,7 @@ type Order struct {
 	FillAmount  decimal.Decimal `json:"fill_amount,omitempty"`
 	MinAmount   decimal.Decimal `json:"min_amount,omitempty"`
 	Paths       route.Paths     `json:"paths,omitempty"`
-	PriceImpact decimal.Decimal `json:"price_impact,omitempty"`
+	PriceImpact decimal.Decimal `json:"-"`
 
 	Transfers []*Transfer `json:"transfers,omitempty"`
 }
