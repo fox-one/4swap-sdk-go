@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/fox-one/4swap-sdk-go/v2/route"
+	"github.com/fox-one/4swap-sdk-go/v2/swap"
 	"github.com/shopspring/decimal"
 )
 
@@ -168,12 +169,24 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	var ids []uint16
+	var (
+		ids         []uint16
+		one         = decimal.NewFromInt(1)
+		priceImpact = one
+	)
+
 	for _, r := range best.Results(false) {
 		ids = append(ids, r.RouteID)
 
 		p := g[r.PayAssetID][r.FillAssetID]
+		x := p.BaseAmount.Div(p.QuoteAmount)
 		updatePairWithResult(p, r)
+		y := p.BaseAmount.Div(p.QuoteAmount)
+
+		if p.SwapMethod != swap.MethodCurve {
+			z := y.Sub(x).Abs().Div(x).Add(one)
+			priceImpact = priceImpact.Mul(z)
+		}
 	}
 
 	order := &Order{
@@ -182,6 +195,7 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 		FillAssetID: fillAssetID,
 		FillAmount:  best.FillAmount,
 		Paths:       route.Single(ids...),
+		PriceImpact: priceImpact.Sub(one),
 	}
 
 	return order, nil
@@ -206,12 +220,24 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		return nil, ErrInsufficientLiquiditySwapped
 	}
 
-	var ids []uint16
+	var (
+		ids         []uint16
+		one         = decimal.NewFromInt(1)
+		priceImpact = one
+	)
+
 	for _, r := range best.Results(true) {
 		ids = append(ids, r.RouteID)
 
 		p := g[r.PayAssetID][r.FillAssetID]
+		x := p.BaseAmount.Div(p.QuoteAmount)
 		updatePairWithResult(p, r)
+		y := p.BaseAmount.Div(p.QuoteAmount)
+
+		if p.SwapMethod != swap.MethodCurve {
+			z := y.Sub(x).Abs().Div(x).Add(one)
+			priceImpact = priceImpact.Mul(z)
+		}
 	}
 
 	order := &Order{
@@ -220,6 +246,7 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		FillAssetID: fillAssetID,
 		FillAmount:  fillAmount,
 		Paths:       route.Single(ids...),
+		PriceImpact: priceImpact.Sub(one),
 	}
 
 	return order, nil
