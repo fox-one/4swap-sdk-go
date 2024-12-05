@@ -106,6 +106,7 @@ func TestMergeOrders(t *testing.T) {
 			Paths: route.Paths{
 				{Weight: 100, Pairs: []uint16{1, 2, 3}},
 			},
+			PriceImpact: decimal.NewFromFloat(0.001),
 		},
 		{
 			PayAssetID:  "pUSD",
@@ -115,6 +116,7 @@ func TestMergeOrders(t *testing.T) {
 			Paths: route.Paths{
 				{Weight: 100, Pairs: []uint16{1, 2, 3}},
 			},
+			PriceImpact: decimal.NewFromFloat(0.002),
 		},
 		{
 			PayAssetID:  "pUSD",
@@ -124,6 +126,7 @@ func TestMergeOrders(t *testing.T) {
 			Paths: route.Paths{
 				{Weight: 100, Pairs: []uint16{1, 4, 3}},
 			},
+			PriceImpact: decimal.NewFromFloat(0.003),
 		},
 	}
 
@@ -133,4 +136,5 @@ func TestMergeOrders(t *testing.T) {
 	assert.Equal(t, "USDT", m.FillAssetID)
 	assert.Equal(t, decimal.NewFromFloat(100.1+63.9+36.2).String(), m.FillAmount.String())
 	assert.Equal(t, "82:1,2,3;18:1,4,3", m.Paths.String())
+	assert.Equal(t, decimal.NewFromFloat(0.00168).String(), m.PriceImpact.String())
 }

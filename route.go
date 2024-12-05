@@ -260,7 +260,10 @@ func MergeOrders(orders []*Order) *Order {
 		m.PayAmount = m.PayAmount.Add(order.PayAmount)
 		m.FillAssetID = order.FillAssetID
 		m.FillAmount = m.FillAmount.Add(order.FillAmount)
+		m.PriceImpact = order.PriceImpact.Mul(order.PayAmount).Add(m.PriceImpact)
 	}
+
+	m.PriceImpact = m.PriceImpact.Div(m.PayAmount)
 
 	for _, order := range orders {
 		w := order.PayAmount.Div(m.PayAmount).Shift(2)
