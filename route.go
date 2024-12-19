@@ -183,7 +183,7 @@ func Route(pairs []*Pair, payAssetID, fillAssetID string, payAmount decimal.Deci
 		updatePairWithResult(p, r)
 		y := p.BaseAmount.Div(p.QuoteAmount)
 
-		if p.SwapMethod != swap.MethodCurve {
+		if p.SwapMethod != swap.MethodCurve && x.IsPositive() {
 			z := y.Sub(x).Abs().Div(x).Add(one)
 			priceImpact = priceImpact.Mul(z)
 		}
@@ -234,7 +234,7 @@ func ReverseRoute(pairs []*Pair, payAssetID, fillAssetID string, fillAmount deci
 		updatePairWithResult(p, r)
 		y := p.BaseAmount.Div(p.QuoteAmount)
 
-		if p.SwapMethod != swap.MethodCurve {
+		if p.SwapMethod != swap.MethodCurve && x.IsPositive() {
 			z := y.Sub(x).Abs().Div(x).Add(one)
 			priceImpact = priceImpact.Mul(z)
 		}
