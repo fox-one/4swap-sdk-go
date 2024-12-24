@@ -57,6 +57,19 @@ func Swap(pair *Pair, payAssetID string, payAmount decimal.Decimal) (*Result, er
 	return r, nil
 }
 
+// MultiHopSwap trade in a given path
+func MultiHopSwap(pairs []*Pair, payAssetID string, payAmount decimal.Decimal) (result *Result, err error) {
+	for _, pair := range pairs {
+		result, err = Swap(pair, payAssetID, payAmount)
+		if err != nil {
+			return
+		}
+		payAssetID = result.FillAssetID
+		payAmount = result.FillAmount
+	}
+	return
+}
+
 // ReverseSwap is a Reverse version of Swap
 func ReverseSwap(pair *Pair, fillAssetID string, fillAmount decimal.Decimal) (*Result, error) {
 	m := swap.Imp(pair.SwapMethod)
@@ -94,4 +107,18 @@ func ReverseSwap(pair *Pair, fillAssetID string, fillAmount decimal.Decimal) (*R
 	r.ProfitAmount = r.PayAmount.Mul(pair.ProfitRate).Truncate(8)
 
 	return r, nil
+}
+
+// ReverseMultiHopSwap is a Reverse version of MultiHopSwap
+func ReverseMultiHopSwap(pairs []*Pair, fillAssetID string, fillAmount decimal.Decimal) (result *Result, err error) {
+	size := len(pairs)
+	for i := size - 1; i >= 0; i-- {
+		result, err = ReverseSwap(pairs[i], fillAssetID, fillAmount)
+		if err != nil {
+			return
+		}
+		fillAssetID = result.PayAssetID
+		fillAmount = result.PayAmount
+	}
+	return
 }
